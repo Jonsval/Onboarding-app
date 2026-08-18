@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Centro de Notificaciones</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .body-wrap {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Filter Panel */
+    .filter-panel {
+      width: 240px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--border-subtle);
+      padding: 24px 16px;
+      background: var(--bg-sidebar);
+    }
+
+    .fp-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--text-dim);
+      padding: 0 8px;
+      margin-bottom: 12px;
+    }
+
+    .fp-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      color: var(--text-muted);
+      cursor: pointer;
+      margin-bottom: 3px;
+      transition: var(--transition);
+    }
+
+    .fp-item:hover {
+      background: var(--bg-panel-hover);
+      color: var(--text-primary);
+    }
+
+    .fp-item.active {
+      background: rgba(61, 31, 110, 0.35);
+      color: var(--text-white);
+      font-weight: 600;
+    }
+
+    .fp-count {
+      font-size: 11px;
+      background: rgba(255,255,255,0.08);
+      padding: 1px 7px;
+      border-radius: var(--radius-full);
+    }
+
+    .fp-item.active .fp-count {
+      background: rgba(90, 45, 158, 0.4);
+      color: #c09aff;
+    }
+
+    /* Notification Content */
+    .notif-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 36px;
+      min-width: 0;
+    }
+
+    .notif-card {
+      display: flex;
+      gap: 16px;
+      padding: 18px 20px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      margin-bottom: 12px;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .notif-card:hover {
+      border-color: var(--border-med);
+      transform: translateX(2px);
+    }
+
+    .notif-card.unread {
+      border-left: 4px solid var(--morado-cl);
+      background: rgba(34, 34, 51, 0.95);
+    }
+
+    .nc-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .nc-body {
+      flex: 1;
+    }
+
+    .nc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .nc-header h4 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .nc-time {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .nc-body p {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin-bottom: 10px;
+    }
+
+    .nc-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    @media (max-width: 860px) {
+      .body-wrap { flex-direction: column; }
+      .filter-panel { width: 100%; border-right: none; border-top: 1px solid var(--border-subtle); }
+      .notif-content { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="onboarding_dashboard.html" class="sidebar-logo">
+      <div class="logo-box">OB</div>
+      <div class="logo-text">
+        <h1>OnboardingApp</h1>
+        <small>v0.2 — Plataforma Activa</small>
+      </div>
+    </a>
+
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <a href="onboarding_dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="onboarding_cursos.html" class="nav-item">
+        <span class="nav-icon">📚</span> Mis Cursos <span class="badge">3</span>
+      </a>
+      <a href="onboarding_progreso.html" class="nav-item">
+        <span class="nav-icon">📈</span> Mi Progreso
+      </a>
+      <a href="onboarding_materiales.html" class="nav-item">
+        <span class="nav-icon">📁</span> Materiales
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Actividad</div>
+      <a href="onboarding_notificaciones.html" class="nav-item active">
+        <span class="nav-icon">🔔</span> Notificaciones <span class="badge notif-badge-count">2</span>
+      </a>
+      <a href="onboarding_constancias.html" class="nav-item">
+        <span class="nav-icon">🎓</span> Constancias
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Cuenta</div>
+      <a href="onboarding_configuracion.html" class="nav-item">
+        <span class="nav-icon">⚙️</span> Configuración
+      </a>
+    </div>
+
+    <div class="sidebar-user" onclick="window.location.href='onboarding_configuracion.html'">
+      <div class="avatar user-avatar-display">AR</div>
+      <div class="user-info">
+        <strong class="user-name-display">Alejandro Ruiz</strong>
+        <small class="user-role-display">Diseñador Junior</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" aria-label="Menú">☰</button>
+        <div>
+          <h2>Centro de Notificaciones</h2>
+          <p>Avisos sobre tus evaluaciones pendientes, constancias y cursos</p>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button class="btn btn-secondary" onclick="markAllRead()" style="font-size: 13px;">
+          ✓ Marcar todas como leídas
+        </button>
+
+        <div class="profile-dropdown-container">
+          <div class="profile-trigger">
+            <div class="pt-avatar user-avatar-display">AR</div>
+            <span class="pt-name user-name-display">Alejandro Ruiz</span>
+            <span class="pt-caret">▼</span>
+          </div>
+
+          <div class="dropdown-menu">
+            <div class="dd-header">
+              <div class="dd-header-avatar user-avatar-display">AR</div>
+              <div class="dd-header-info">
+                <strong class="user-name-display">Alejandro Ruiz</strong>
+                <small class="user-email-display">alejandro.ruiz@empresa.com</small>
+              </div>
+            </div>
+            <a href="onboarding_configuracion.html" class="dd-item">👤 Mi Perfil</a>
+            <a href="onboarding_constancias.html" class="dd-item">🎓 Mis Constancias</a>
+            <a href="onboarding_progreso.html" class="dd-item">📊 Mi Progreso</a>
+            <a href="onboarding_configuracion.html" class="dd-item">⚙️ Configuración</a>
+            <hr class="dd-divider">
+            <a href="#" class="dd-item dd-logout">🚪 Cerrar Sesión</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- BODY WRAP -->
+    <div class="body-wrap">
+
+      <!-- Filter Panel -->
+      <aside class="filter-panel">
+        <div class="fp-title">Filtrar por tipo</div>
+        
+        <div class="fp-item active" data-type="all" onclick="setNotifType('all', this)">
+          <span>Todas</span>
+          <span class="fp-count" id="countNotifsAll">4</span>
+        </div>
+
+        <div class="fp-item" data-type="evaluacion" onclick="setNotifType('evaluacion', this)">
+          <span>📝 Evaluaciones</span>
+          <span class="fp-count">1</span>
+        </div>
+
+        <div class="fp-item" data-type="constancia" onclick="setNotifType('constancia', this)">
+          <span>🎓 Constancias</span>
+          <span class="fp-count">1</span>
+        </div>
+
+        <div class="fp-item" data-type="material" onclick="setNotifType('material', this)">
+          <span>📁 Materiales</span>
+          <span class="fp-count">1</span>
+        </div>
+
+        <div class="fp-item" data-type="sistema" onclick="setNotifType('sistema', this)">
+          <span>⚙️ Sistema</span>
+          <span class="fp-count">1</span>
+        </div>
+      </aside>
+
+      <!-- Content -->
+      <main class="notif-content">
+        <div class="section-title">
+          <span>Notificaciones</span>
+        </div>
+
+        <div id="notifListContainer">
+          <!-- Rendered by JS -->
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  let currentNotifFilter = 'all';
+
+  function renderNotifs() {
+    const container = document.getElementById('notifListContainer');
+    const notifs = OnboardingApp.notifications;
+
+    const filtered = notifs.filter(n => {
+      return (currentNotifFilter === 'all') || (n.type === currentNotifFilter);
+    });
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+          <div style="font-size: 32px; margin-bottom: 8px;">🔔</div>
+          <p>No tienes notificaciones en esta categoría.</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = filtered.map(n => {
+      let icon = '🔔';
+      let icoBg = 'rgba(61,31,110,0.35)';
+      if (n.type === 'evaluacion') { icon = '📝'; icoBg = 'rgba(196,92,26,0.25)'; }
+      if (n.type === 'constancia') { icon = '🎓'; icoBg = 'rgba(201,168,76,0.25)'; }
+      if (n.type === 'material')   { icon = '📄'; icoBg = 'rgba(30,58,110,0.4)'; }
+      if (n.type === 'sistema')    { icon = '✨'; icoBg = 'rgba(76,175,130,0.2)'; }
+
+      return `
+        <div class="notif-card ${!n.read ? 'unread' : ''}">
+          <div class="nc-icon" style="background: ${icoBg};">${icon}</div>
+          <div class="nc-body">
+            <div class="nc-header">
+              <h4>${n.title}</h4>
+              <span class="nc-time">${n.time}</span>
+            </div>
+            <p>${n.message}</p>
+            <div class="nc-actions">
+              <a href="${n.url}" class="btn btn-primary" style="padding: 6px 14px; font-size: 12.5px;">
+                Ver detalle →
+              </a>
+              <button class="btn btn-ghost" onclick="deleteNotification('${n.id}')" style="padding: 6px 12px; font-size: 12.5px;">
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function setNotifType(type, btn) {
+    currentNotifFilter = type;
+    document.querySelectorAll('.fp-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderNotifs();
+  }
+
+  function markAllRead() {
+    OnboardingApp.markAllNotifsRead();
+    OnboardingApp.showToast('Actualizado', 'Todas las notificaciones se marcaron como leídas.', 'success');
+    renderNotifs();
+  }
+
+  function deleteNotification(id) {
+    OnboardingApp.notifications = OnboardingApp.notifications.filter(n => n.id !== id);
+    OnboardingApp.saveNotifications();
+    OnboardingApp.showToast('Eliminada', 'Notificación eliminada.', 'info');
+    renderNotifs();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    renderNotifs();
+  });
+</script>
+</body>
+</html>

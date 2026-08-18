@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Constancia Digital PDF</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      background: var(--bg-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 30px 20px;
+    }
+
+    /* Top Actions Bar */
+    .top-actions-bar {
+      width: 100%;
+      max-width: 1060px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .back-link:hover {
+      color: var(--text-white);
+      transform: translateX(-2px);
+    }
+
+    .action-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* Certificate Document Container */
+    .diploma-wrap {
+      width: 100%;
+      max-width: 1060px;
+      background: #fdfcf7;
+      color: #1a1a2e;
+      border-radius: var(--radius-md);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(201,168,76,0.3);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .diploma-band-top {
+      height: 16px;
+      background: linear-gradient(90deg, #1a2a4a 0%, #3d1f6e 35%, #c45c1a 65%, #c9a84c 85%, #1a2a4a 100%);
+    }
+
+    .diploma-outer-frame {
+      width: calc(100% - 44px);
+      margin: 22px auto;
+      border: 2px solid var(--dorado);
+      padding: 6px;
+      position: relative;
+      background: #fefdfa;
+    }
+
+    .diploma-inner-frame {
+      border: 1px solid rgba(201,168,76,0.45);
+      padding: 44px 56px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      background:
+        radial-gradient(ellipse at top left, rgba(201,168,76,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at bottom right, rgba(61,31,110,0.05) 0%, transparent 60%),
+        #fefdf9;
+    }
+
+    /* Corners */
+    .corner {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+    }
+    .corner-tl { top: 6px; left: 6px; border-top: 3px solid var(--dorado); border-left: 3px solid var(--dorado); }
+    .corner-tr { top: 6px; right: 6px; border-top: 3px solid var(--dorado); border-right: 3px solid var(--dorado); }
+    .corner-bl { bottom: 6px; left: 6px; border-bottom: 3px solid var(--dorado); border-left: 3px solid var(--dorado); }
+    .corner-br { bottom: 6px; right: 6px; border-bottom: 3px solid var(--dorado); border-right: 3px solid var(--dorado); }
+
+    .org-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .org-badge {
+      width: 36px;
+      height: 36px;
+      background: var(--naranja);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .org-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #1a2a4a;
+    }
+
+    .cert-heading {
+      font-size: 32px;
+      font-weight: 900;
+      color: #1a1a2e;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .cert-subheading {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--dorado);
+      margin-bottom: 24px;
+    }
+
+    .cert-pretext {
+      font-size: 15px;
+      color: #555566;
+      font-style: italic;
+      margin-bottom: 12px;
+    }
+
+    .student-name {
+      font-size: 34px;
+      font-weight: 900;
+      color: #1a2a4a;
+      border-bottom: 2px solid var(--dorado);
+      padding: 0 36px 6px;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .cert-body-text {
+      font-size: 15px;
+      color: #444455;
+      text-align: center;
+      max-width: 720px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .course-highlight {
+      font-size: 20px;
+      font-weight: 800;
+      color: #2b1352;
+      display: block;
+      margin: 8px 0;
+    }
+
+    /* Footer Signatures & QR */
+    .diploma-footer {
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(201,168,76,0.3);
+    }
+
+    .sig-col {
+      text-align: center;
+      width: 240px;
+    }
+
+    .sig-line {
+      width: 100%;
+      height: 1px;
+      background: #2b1352;
+      margin-bottom: 8px;
+    }
+
+    .sig-name {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #1a2a4a;
+    }
+
+    .sig-role {
+      font-size: 11.5px;
+      color: #666677;
+    }
+
+    .qr-col {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .qr-box {
+      width: 60px;
+      height: 60px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .qr-info {
+      font-size: 11px;
+      color: #666677;
+      line-height: 1.4;
+    }
+
+    .qr-info strong {
+      color: #1a1a2e;
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+    }
+
+    @media print {
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+      }
+      .top-actions-bar {
+        display: none !important;
+      }
+      .diploma-wrap {
+        box-shadow: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Navigation & Print Controls -->
+<div class="top-actions-bar">
+  <a href="onboarding_constancias.html" class="back-link">
+    ← Volver a Constancias
+  </a>
+
+  <div class="action-group">
+    <button class="btn btn-secondary" onclick="shareCertURL()">
+      🔗 Copiar Enlace
+    </button>
+    <button class="btn btn-primary" onclick="window.print()">
+      🖨️ Descargar / Imprimir PDF
+    </button>
+  </div>
+</div>
+
+<!-- Printable Certificate Wrap -->
+<div class="diploma-wrap">
+  <div class="diploma-band-top"></div>
+
+  <div class="diploma-outer-frame">
+    <!-- Ornamental Corners -->
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+
+    <div class="diploma-inner-frame">
+      
+      <!-- Organization Logo -->
+      <div class="org-logo">
+        <div class="org-badge">OB</div>
+        <span class="org-title">Onboarding Learning Academy</span>
+      </div>
+
+      <div class="cert-heading">Constancia de Acreditación</div>
+      <div class="cert-subheading">Certificación Oficial de Capacitación</div>
+
+      <div class="cert-pretext">Se otorga la presente constancia de acreditación a:</div>
+      
+      <div class="student-name user-name-display" id="certStudentName">
+        Alejandro Ruiz
+      </div>
+
+      <div class="cert-body-text">
+        Por haber completado y aprobado satisfactoriamente todos los módulos teóricos, prácticos y la evaluación final del curso institucional:
+        <span class="course-highlight" id="certCourseTitle">
+          Cultura y Valores de la Empresa
+        </span>
+        Cumpliendo con los estándares de calidad, asistencia y aprovechamiento fijados por el programa corporativo de inducción.
+      </div>
+
+      <!-- Footer & Signatures -->
+      <div class="diploma-footer">
+        
+        <!-- Left: Signature 1 -->
+        <div class="sig-col">
+          <div class="sig-line"></div>
+          <div class="sig-name" id="sigInstructorName">Mariana Silva</div>
+          <div class="sig-role" id="sigInstructorRole">Directora de People & Talent</div>
+        </div>
+
+        <!-- Center: QR & Verification -->
+        <div class="qr-col">
+          <div class="qr-box">📱</div>
+          <div class="qr-info">
+            <span>Folio de Validación:</span>
+            <strong id="certFolioDisplay">CERT-OB-2026-0089</strong>
+            <span id="certDateDisplay">Emitido: 12 de Agosto, 2026</span>
+          </div>
+        </div>
+
+        <!-- Right: Signature 2 -->
+        <div class="sig-col">
+          <div class="sig-line"></div>
+          <div class="sig-name">Dirección General</div>
+          <div class="sig-role">Comité de Capacitación Continua</div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const certParam = urlParams.get('cert') || 'cultura';
+
+    const certConfig = {
+      'cultura': {
+        title: 'Cultura y Valores de la Empresa',
+        instructor: 'Mariana Silva',
+        role: 'Directora de People & Talent',
+        folio: 'CERT-OB-2026-0089',
+        date: '12 de Agosto, 2026'
+      },
+      'seguridad': {
+        title: 'Seguridad de la Información y Políticas',
+        instructor: 'Carlos Mendoza',
+        role: 'CISO & Seguridad de la Información',
+        folio: 'CERT-OB-2026-0104',
+        date: '14 de Agosto, 2026'
+      },
+      'herramientas': {
+        title: 'Herramientas y Metodologías de Trabajo',
+        instructor: 'Sofía Valenzuela',
+        role: 'Lead Project Manager',
+        folio: 'CERT-OB-2026-0142',
+        date: '17 de Agosto, 2026'
+      },
+      'c1': {
+        title: 'Cultura y Valores de la Empresa',
+        instructor: 'Mariana Silva',
+        role: 'Directora de People & Talent',
+        folio: 'CERT-OB-2026-0089',
+        date: '12 de Agosto, 2026'
+      },
+      'c2': {
+        title: 'Seguridad de la Información y Políticas',
+        instructor: 'Carlos Mendoza',
+        role: 'CISO & Seguridad de la Información',
+        folio: 'CERT-OB-2026-0104',
+        date: '14 de Agosto, 2026'
+      },
+      'c3': {
+        title: 'Herramientas y Metodologías de Trabajo',
+        instructor: 'Sofía Valenzuela',
+        role: 'Lead Project Manager',
+        folio: 'CERT-OB-2026-0142',
+        date: '17 de Agosto, 2026'
+      }
+    };
+
+    const cfg = certConfig[certParam] || certConfig['cultura'];
+    document.getElementById('certCourseTitle').textContent = cfg.title;
+    document.getElementById('sigInstructorName').textContent = cfg.instructor;
+    document.getElementById('sigInstructorRole').textContent = cfg.role;
+    document.getElementById('certFolioDisplay').textContent = cfg.folio;
+    document.getElementById('certDateDisplay').textContent = 'Emitido: ' + cfg.date;
+  });
+
+  function shareCertURL() {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href);
+      OnboardingApp.showToast('Enlace copiado', 'URL de constancia copiada al portapapeles.', 'success');
+    }
+  }
+</script>
+</body>
+</html>

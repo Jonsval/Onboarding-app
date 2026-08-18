@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Mi Progreso</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Summary Card */
+    .summary-card {
+      background: linear-gradient(110deg, var(--morado) 0%, var(--azul-med) 60%, var(--azul) 100%);
+      border-radius: var(--radius-xl);
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .summary-card::before {
+      content: '';
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      border: 44px solid rgba(255,255,255,0.05);
+      right: -60px;
+      bottom: -80px;
+      pointer-events: none;
+    }
+
+    .circle-wrap {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      flex-shrink: 0;
+    }
+
+    .circle-wrap svg {
+      transform: rotate(-90deg);
+    }
+
+    .circle-bg {
+      fill: none;
+      stroke: rgba(255,255,255,0.12);
+      stroke-width: 9;
+    }
+
+    .circle-fill {
+      fill: none;
+      stroke: var(--naranja-cl);
+      stroke-width: 9;
+      stroke-linecap: round;
+      stroke-dasharray: 301;
+      stroke-dashoffset: 150;
+      transition: stroke-dashoffset 0.8s ease;
+    }
+
+    .circle-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      text-align: center;
+    }
+
+    .circle-text .pct {
+      font-size: 26px;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .circle-text small {
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .summary-info h3 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .summary-info p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.5;
+      max-width: 520px;
+    }
+
+    .summary-stats {
+      margin-left: auto;
+      display: flex;
+      gap: 28px;
+      z-index: 1;
+    }
+
+    .ss-item {
+      text-align: center;
+    }
+
+    .ss-val {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .ss-lbl {
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    /* Grid Layout */
+    .prog-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+    }
+
+    /* Weekly Activity Bars */
+    .bar-chart-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      height: 160px;
+      padding: 16px 0 6px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 16px;
+    }
+
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .bar-pill {
+      width: 100%;
+      max-width: 38px;
+      background: rgba(90, 45, 158, 0.35);
+      border-radius: var(--radius-sm);
+      transition: height 0.5s ease, background 0.2s;
+      position: relative;
+    }
+
+    .bar-pill:hover {
+      background: var(--naranja-cl);
+    }
+
+    .bar-pill.today {
+      background: linear-gradient(to top, var(--naranja), var(--naranja-cl));
+    }
+
+    .bar-day {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .bar-val {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+
+    /* Timeline Items */
+    .timeline-item {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+    }
+
+    .tl-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .tl-info {
+      flex: 1;
+    }
+
+    .tl-info strong {
+      display: block;
+      font-size: 14px;
+      color: var(--text-white);
+      margin-bottom: 4px;
+    }
+
+    .tl-info p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    /* Radar / Competency row */
+    .comp-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .comp-row:last-child {
+      border-bottom: none;
+    }
+
+    .comp-name {
+      font-size: 13.5px;
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .comp-bar {
+      width: 110px;
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .comp-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+    }
+
+    .comp-score {
+      font-size: 13px;
+      font-weight: 700;
+      width: 36px;
+      text-align: right;
+    }
+
+    @media (max-width: 960px) {
+      .summary-card { flex-direction: column; text-align: center; }
+      .summary-stats { margin-left: 0; justify-content: center; }
+      .prog-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="onboarding_dashboard.html" class="sidebar-logo">
+      <div class="logo-box">OB</div>
+      <div class="logo-text">
+        <h1>OnboardingApp</h1>
+        <small>v0.2 — Plataforma Activa</small>
+      </div>
+    </a>
+
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <a href="onboarding_dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="onboarding_cursos.html" class="nav-item">
+        <span class="nav-icon">📚</span> Mis Cursos <span class="badge">3</span>
+      </a>
+      <a href="onboarding_progreso.html" class="nav-item active">
+        <span class="nav-icon">📈</span> Mi Progreso
+      </a>
+      <a href="onboarding_materiales.html" class="nav-item">
+        <span class="nav-icon">📁</span> Materiales
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Actividad</div>
+      <a href="onboarding_notificaciones.html" class="nav-item">
+        <span class="nav-icon">🔔</span> Notificaciones <span class="badge notif-badge-count">2</span>
+      </a>
+      <a href="onboarding_constancias.html" class="nav-item">
+        <span class="nav-icon">🎓</span> Constancias
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Cuenta</div>
+      <a href="onboarding_configuracion.html" class="nav-item">
+        <span class="nav-icon">⚙️</span> Configuración
+      </a>
+    </div>
+
+    <div class="sidebar-user" onclick="window.location.href='onboarding_configuracion.html'">
+      <div class="avatar user-avatar-display">AR</div>
+      <div class="user-info">
+        <strong class="user-name-display">Alejandro Ruiz</strong>
+        <small class="user-role-display">Diseñador Junior</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" aria-label="Menú">☰</button>
+        <div>
+          <h2>Mi Progreso y Analítica</h2>
+          <p>Métricas de aprendizaje, horas dedicadas y competencias adquiridas</p>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a href="onboarding_busqueda.html" class="search-trigger-btn">
+          <span>🔍 Buscar...</span>
+          <kbd>/</kbd>
+        </a>
+
+        <a href="onboarding_notificaciones.html" class="notif-btn" title="Notificaciones">
+          🔔<div class="notif-dot"></div>
+        </a>
+
+        <div class="profile-dropdown-container">
+          <div class="profile-trigger">
+            <div class="pt-avatar user-avatar-display">AR</div>
+            <span class="pt-name user-name-display">Alejandro Ruiz</span>
+            <span class="pt-caret">▼</span>
+          </div>
+
+          <div class="dropdown-menu">
+            <div class="dd-header">
+              <div class="dd-header-avatar user-avatar-display">AR</div>
+              <div class="dd-header-info">
+                <strong class="user-name-display">Alejandro Ruiz</strong>
+                <small class="user-email-display">alejandro.ruiz@empresa.com</small>
+              </div>
+            </div>
+            <a href="onboarding_configuracion.html" class="dd-item">👤 Mi Perfil</a>
+            <a href="onboarding_constancias.html" class="dd-item">🎓 Mis Constancias</a>
+            <a href="onboarding_progreso.html" class="dd-item">📊 Mi Progreso</a>
+            <a href="onboarding_configuracion.html" class="dd-item">⚙️ Configuración</a>
+            <hr class="dd-divider">
+            <a href="#" class="dd-item dd-logout">🚪 Cerrar Sesión</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- Summary Banner -->
+      <div class="summary-card">
+        <div class="circle-wrap">
+          <svg viewBox="0 0 120 120" width="120" height="120">
+            <circle class="circle-bg" cx="60" cy="60" r="48"/>
+            <circle class="circle-fill" id="progRadialFill" cx="60" cy="60" r="48"/>
+          </svg>
+          <div class="circle-text">
+            <div class="pct" id="progRadialPct">50%</div>
+            <small>Completado</small>
+          </div>
+        </div>
+
+        <div class="summary-info">
+          <h3>Ruta de Onboarding Activa</h3>
+          <p>Has completado 2 de tus 5 cursos obligatorios con excelentes calificaciones. Estás en el <strong>percentil 92%</strong> de velocidad de inducción en tu cohorte.</p>
+        </div>
+
+        <div class="summary-stats">
+          <div class="ss-item">
+            <div class="ss-val">5.2h</div>
+            <div class="ss-lbl">Tiempo Total</div>
+          </div>
+          <div class="ss-item">
+            <div class="ss-val" style="color: var(--verde)">94%</div>
+            <div class="ss-lbl">Prom. Evaluaciones</div>
+          </div>
+          <div class="ss-item">
+            <div class="ss-val" style="color: var(--dorado-cl)">850</div>
+            <div class="ss-lbl">Puntos XP</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPIs Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Cursos Completados</div>
+          <div class="stat-value" style="color: var(--verde)">2 / 5</div>
+          <div class="stat-sub">40% de la malla curricular</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Constancias Obtenidas</div>
+          <div class="stat-value" style="color: var(--dorado-cl)">2</div>
+          <div class="stat-sub">Verificables oficialmente</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Racha de Estudio</div>
+          <div class="stat-value" style="color: var(--naranja-cl)">4 días</div>
+          <div class="stat-sub">¡Mantén el ritmo diario!</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Nivel de Usuario</div>
+          <div class="stat-value">Nivel 2</div>
+          <div class="stat-sub">Explorador (+150 XP p/ nivel 3)</div>
+        </div>
+      </div>
+
+      <!-- Main Layout -->
+      <div class="prog-grid">
+
+        <!-- Left: Activity & History -->
+        <div>
+
+          <!-- Weekly Activity Chart -->
+          <div class="panel" style="margin-bottom: 24px;">
+            <div class="section-title">
+              <span>Horas Dedicadas esta Semana</span>
+              <span style="font-size: 12.5px; color: var(--text-muted); font-weight: 500;">Meta semanal: 6h</span>
+            </div>
+
+            <div class="bar-chart-container">
+              <div class="bar-col">
+                <span class="bar-val">1.2h</span>
+                <div class="bar-pill" style="height: 60%;"></div>
+                <span class="bar-day">Lun</span>
+              </div>
+              <div class="bar-col">
+                <span class="bar-val">1.8h</span>
+                <div class="bar-pill" style="height: 90%;"></div>
+                <span class="bar-day">Mar</span>
+              </div>
+              <div class="bar-col">
+                <span class="bar-val">0.8h</span>
+                <div class="bar-pill" style="height: 40%;"></div>
+                <span class="bar-day">Mié</span>
+              </div>
+              <div class="bar-col">
+                <span class="bar-val">1.4h</span>
+                <div class="bar-pill today" style="height: 70%;"></div>
+                <span class="bar-day">Jue</span>
+              </div>
+              <div class="bar-col">
+                <span class="bar-val">0.0h</span>
+                <div class="bar-pill" style="height: 8%;"></div>
+                <span class="bar-day">Vie</span>
+              </div>
+            </div>
+            <p style="font-size: 12.5px; color: var(--text-muted);">Has dedicado 5.2 horas esta semana. ¡Vas un 15% arriba del promedio estimado!</p>
+          </div>
+
+          <!-- Timeline History -->
+          <div class="panel">
+            <h3 style="font-size: 15px; font-weight: 800; color: var(--text-white); margin-bottom: 16px;">
+              Historial Reciente de Módulos Completados
+            </h3>
+
+            <div class="timeline-item">
+              <div class="tl-icon" style="background: rgba(76,175,130,0.2); color: var(--verde);">✓</div>
+              <div class="tl-info">
+                <strong>Módulo 2: Convenciones y Políticas</strong>
+                <p>Herramientas y Metodologías · Lectura guiada completada hace 2 horas.</p>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="tl-icon" style="background: rgba(76,175,130,0.2); color: var(--verde);">✓</div>
+              <div class="tl-info">
+                <strong>Módulo 1: Introducción al Ecosistema</strong>
+                <p>Herramientas y Metodologías · Video completado ayer.</p>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="tl-icon" style="background: rgba(201,168,76,0.2); color: var(--dorado-cl);">🎓</div>
+              <div class="tl-info">
+                <strong>Constancia Emitida: Seguridad de la Información</strong>
+                <p>Aprobada con 95/100 puntos · Emitida el 14 de Agosto, 2026.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: Competencies -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+
+          <!-- Competencies -->
+          <div class="panel">
+            <h4 style="font-size: 15px; font-weight: 800; color: var(--text-white); margin-bottom: 16px;">
+              Dominio de Competencias
+            </h4>
+
+            <div class="comp-row">
+              <div class="comp-name">Cultura & Valores</div>
+              <div class="comp-bar"><div class="comp-fill" style="width: 100%; background: var(--verde);"></div></div>
+              <div class="comp-score" style="color: var(--verde);">100%</div>
+            </div>
+
+            <div class="comp-row">
+              <div class="comp-name">Ciberseguridad</div>
+              <div class="comp-bar"><div class="comp-fill" style="width: 100%; background: var(--verde);"></div></div>
+              <div class="comp-score" style="color: var(--verde);">100%</div>
+            </div>
+
+            <div class="comp-row">
+              <div class="comp-name">Git & Flujo de Trabajo</div>
+              <div class="comp-bar"><div class="comp-fill" style="width: 75%; background: var(--naranja-cl);"></div></div>
+              <div class="comp-score" style="color: var(--naranja-cl);">75%</div>
+            </div>
+
+            <div class="comp-row">
+              <div class="comp-name">Arquitectura Limpia</div>
+              <div class="comp-bar"><div class="comp-fill" style="width: 10%; background: var(--morado-glow);"></div></div>
+              <div class="comp-score" style="color: var(--text-muted);">10%</div>
+            </div>
+
+            <div class="comp-row">
+              <div class="comp-name">Testing & Calidad</div>
+              <div class="comp-bar"><div class="comp-fill" style="width: 0%; background: var(--text-dim);"></div></div>
+              <div class="comp-score" style="color: var(--text-dim);">0%</div>
+            </div>
+          </div>
+
+          <!-- Badges Mini Panel -->
+          <div class="panel" style="text-align: center;">
+            <h4 style="font-size: 14px; font-weight: 800; color: var(--text-white); margin-bottom: 12px;">
+              Insignias Desbloqueadas
+            </h4>
+            <div style="display: flex; justify-content: center; gap: 14px; margin-bottom: 16px;">
+              <div title="Primer Día Superado" style="width: 48px; height: 48px; border-radius: 50%; background: rgba(196,92,26,0.2); border: 2px solid var(--naranja-cl); display: flex; align-items: center; justify-content: center; font-size: 22px;">🌱</div>
+              <div title="Guardián de la Seguridad" style="width: 48px; height: 48px; border-radius: 50%; background: rgba(76,175,130,0.2); border: 2px solid var(--verde); display: flex; align-items: center; justify-content: center; font-size: 22px;">🔒</div>
+              <div title="Pionero Onboarding" style="width: 48px; height: 48px; border-radius: 50%; background: rgba(201,168,76,0.2); border: 2px solid var(--dorado-cl); display: flex; align-items: center; justify-content: center; font-size: 22px;">🏆</div>
+            </div>
+            <a href="onboarding_logro.html" class="btn btn-secondary" style="width: 100%; font-size: 12.5px;">Ver Galería de Logros</a>
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const overall = OnboardingApp.getOverallProgress();
+    document.getElementById('progRadialPct').textContent = overall + '%';
+    
+    // Circle perimeter 2*pi*48 ~= 301.6
+    const fillEl = document.getElementById('progRadialFill');
+    const offset = 301 - (301 * (overall / 100));
+    fillEl.style.strokeDashoffset = offset;
+  });
+</script>
+</body>
+</html>

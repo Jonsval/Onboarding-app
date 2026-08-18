@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Menú de Perfil</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      background: var(--bg-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+    }
+
+    .demo-card {
+      width: 100%;
+      max-width: 600px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 36px;
+      box-shadow: var(--shadow-xl);
+      text-align: center;
+    }
+
+    .demo-card h2 {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 8px;
+    }
+
+    .demo-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    /* Embedded dropdown preview */
+    .preview-box {
+      width: 100%;
+      max-width: 340px;
+      margin: 0 auto 28px;
+      background: var(--bg-panel-alt);
+      border: 1px solid var(--border-med);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      box-shadow: var(--shadow-lg);
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+<div class="demo-card">
+  <h2>Menú Desplegable de Usuario</h2>
+  <p>Componente interactivo integrado en el encabezado superior de todas las páginas de la plataforma.</p>
+
+  <div class="preview-box">
+    <div class="dd-header">
+      <div class="dd-header-avatar user-avatar-display">AR</div>
+      <div class="dd-header-info">
+        <strong class="user-name-display">Alejandro Ruiz</strong>
+        <small class="user-email-display">alejandro.ruiz@empresa.com</small>
+      </div>
+    </div>
+    
+    <a href="onboarding_configuracion.html" class="dd-item">👤 Mi Perfil Personal</a>
+    <a href="onboarding_constancias.html" class="dd-item">🎓 Mis Constancias Acreditadas</a>
+    <a href="onboarding_progreso.html" class="dd-item">📊 Mi Progreso & Métricas</a>
+    <a href="onboarding_configuracion.html" class="dd-item">⚙️ Configuración & Apariencia</a>
+    
+    <hr class="dd-divider">
+    <a href="index.html" class="dd-item dd-logout">🚪 Cerrar Sesión</a>
+  </div>
+
+  <div style="display: flex; gap: 10px; justify-content: center;">
+    <a href="onboarding_dashboard.html" class="btn btn-primary">Ir al Dashboard Principal →</a>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Detalle de Curso</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Course Hero */
+    .course-hero {
+      background: linear-gradient(100deg, #1e0e38 0%, #3d1f6e 45%, #1e3a6e 100%);
+      padding: 36px 40px;
+      border-bottom: 1px solid var(--border-subtle);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .course-hero::after {
+      content: '';
+      position: absolute;
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      border: 56px solid rgba(255, 255, 255, 0.04);
+      right: -100px;
+      top: -120px;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .hero-icon {
+      width: 72px;
+      height: 72px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hero-info h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+      line-height: 1.25;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+
+    .hero-meta span {
+      font-size: 13.5px;
+      color: rgba(255, 255, 255, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-right {
+      margin-left: auto;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .hero-pct {
+      font-size: 42px;
+      font-weight: 900;
+      color: var(--naranja-cl);
+      line-height: 1;
+      text-shadow: 0 0 20px rgba(224, 110, 40, 0.35);
+    }
+
+    .hero-pct-label {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 5px;
+    }
+
+    .hero-bar {
+      width: 180px;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-top: 10px;
+      margin-left: auto;
+    }
+
+    .hero-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--naranja), var(--naranja-cl));
+      border-radius: var(--radius-full);
+      width: 50%;
+    }
+
+    /* Body Layout */
+    .body-grid {
+      display: flex;
+      flex: 1;
+    }
+
+    .modules-col {
+      flex: 1;
+      padding: 32px 36px;
+      min-width: 0;
+    }
+
+    .side-info {
+      width: 360px;
+      background: var(--bg-sidebar);
+      border-left: 1px solid var(--border-subtle);
+      padding: 32px 28px;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 20px;
+    }
+
+    /* Module Items */
+    .module-item {
+      display: flex;
+      gap: 16px;
+      padding: 18px 20px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      margin-bottom: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: var(--transition);
+      align-items: center;
+    }
+
+    .module-item:hover {
+      border-color: rgba(90, 45, 158, 0.5);
+      transform: translateX(3px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .module-item.active-mod {
+      border-color: var(--morado-cl);
+      background: rgba(61, 31, 110, 0.18);
+      box-shadow: 0 0 16px rgba(90, 45, 158, 0.2);
+    }
+
+    .mod-num {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .mn-done   { background: rgba(76, 175, 130, 0.2); color: var(--verde); border: 1px solid rgba(76, 175, 130, 0.35); }
+    .mn-active { background: var(--naranja); color: #fff; box-shadow: 0 2px 10px rgba(196, 92, 26, 0.4); }
+    .mn-lock   { background: rgba(255, 255, 255, 0.05); color: var(--text-dim); }
+
+    .mod-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mod-info h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .mod-info p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .mod-tags {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mod-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+    }
+
+    .mt-vid  { background: rgba(30, 58, 110, 0.4); color: #7eaaff; }
+    .mt-lec  { background: rgba(61, 31, 110, 0.4); color: #c09aff; }
+    .mt-eval { background: rgba(196, 92, 26, 0.25); color: var(--naranja-cl); }
+    .mt-doc  { background: rgba(76, 175, 130, 0.2); color: var(--verde); }
+
+    .mod-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .mod-time {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .mod-check {
+      font-size: 18px;
+      margin-top: 4px;
+    }
+
+    /* Side Info Blocks */
+    .info-block {
+      margin-bottom: 28px;
+    }
+
+    .info-block h5 {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .instructor-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      background: var(--bg-panel);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .inst-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--azul-med), var(--morado));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .inst-info strong {
+      display: block;
+      font-size: 14px;
+      color: var(--text-white);
+    }
+
+    .inst-info small {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .obj-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 8px 0;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+
+    .obj-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--naranja-cl);
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 960px) {
+      .body-grid {
+        flex-direction: column;
+      }
+      .side-info {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--border-subtle);
+      }
+      .hero-row {
+        flex-direction: column;
+      }
+      .hero-right {
+        margin-left: 0;
+        text-align: left;
+        margin-top: 16px;
+      }
+      .hero-bar {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="onboarding_dashboard.html" class="sidebar-logo">
+      <div class="logo-box">OB</div>
+      <div class="logo-text">
+        <h1>OnboardingApp</h1>
+        <small>v0.2 — Plataforma Activa</small>
+      </div>
+    </a>
+
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <a href="onboarding_dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="onboarding_cursos.html" class="nav-item active">
+        <span class="nav-icon">📚</span> Mis Cursos <span class="badge">3</span>
+      </a>
+      <a href="onboarding_progreso.html" class="nav-item">
+        <span class="nav-icon">📈</span> Mi Progreso
+      </a>
+      <a href="onboarding_materiales.html" class="nav-item">
+        <span class="nav-icon">📁</span> Materiales
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Actividad</div>
+      <a href="onboarding_notificaciones.html" class="nav-item">
+        <span class="nav-icon">🔔</span> Notificaciones <span class="badge notif-badge-count">2</span>
+      </a>
+      <a href="onboarding_constancias.html" class="nav-item">
+        <span class="nav-icon">🎓</span> Constancias
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Cuenta</div>
+      <a href="onboarding_configuracion.html" class="nav-item">
+        <span class="nav-icon">⚙️</span> Configuración
+      </a>
+    </div>
+
+    <div class="sidebar-user" onclick="window.location.href='onboarding_configuracion.html'">
+      <div class="avatar user-avatar-display">AR</div>
+      <div class="user-info">
+        <strong class="user-name-display">Alejandro Ruiz</strong>
+        <small class="user-role-display">Diseñador Junior</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" aria-label="Menú">☰</button>
+        <div class="breadcrumb">
+          <a href="onboarding_cursos.html">Mis Cursos</a>
+          <span class="sep">›</span>
+          <span>Herramientas y Metodologías</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a href="onboarding_busqueda.html" class="search-trigger-btn">
+          <span>🔍 Buscar en este curso...</span>
+          <kbd>/</kbd>
+        </a>
+
+        <a href="onboarding_notificaciones.html" class="notif-btn" title="Notificaciones">
+          🔔<div class="notif-dot"></div>
+        </a>
+
+        <div class="profile-dropdown-container">
+          <div class="profile-trigger">
+            <div class="pt-avatar user-avatar-display">AR</div>
+            <span class="pt-name user-name-display">Alejandro Ruiz</span>
+            <span class="pt-caret">▼</span>
+          </div>
+
+          <div class="dropdown-menu">
+            <div class="dd-header">
+              <div class="dd-header-avatar user-avatar-display">AR</div>
+              <div class="dd-header-info">
+                <strong class="user-name-display">Alejandro Ruiz</strong>
+                <small class="user-email-display">alejandro.ruiz@empresa.com</small>
+              </div>
+            </div>
+            <a href="onboarding_configuracion.html" class="dd-item">👤 Mi Perfil</a>
+            <a href="onboarding_constancias.html" class="dd-item">🎓 Mis Constancias</a>
+            <a href="onboarding_progreso.html" class="dd-item">📊 Mi Progreso</a>
+            <a href="onboarding_configuracion.html" class="dd-item">⚙️ Configuración</a>
+            <hr class="dd-divider">
+            <a href="#" class="dd-item dd-logout">🚪 Cerrar Sesión</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- COURSE HERO -->
+    <div class="course-hero">
+      <div class="hero-content">
+        <div class="hero-row">
+          <div class="hero-icon">🛠️</div>
+          <div class="hero-info">
+            <h1>Herramientas y Metodologías de Trabajo</h1>
+            <div class="hero-meta">
+              <span>⏱️ 4h 30m estimadas</span>
+              <span>📑 4 módulos en total</span>
+              <span>👩‍🏫 Sofía Valenzuela (Lead PM)</span>
+              <span>🎯 Nivel Intermedio</span>
+            </div>
+            <a href="onboarding_evaluacion.html" class="btn btn-accent">Continuar con la Evaluación →</a>
+          </div>
+
+          <div class="hero-right">
+            <div class="hero-pct">50%</div>
+            <div class="hero-pct-label">Progreso del curso</div>
+            <div class="hero-bar"><div class="hero-bar-fill"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COURSE BODY -->
+    <div class="body-grid">
+
+      <!-- Modules List -->
+      <div class="modules-col">
+        <div class="section-title">Temario y Módulos de Aprendizaje</div>
+
+        <!-- Mod 1: Video -->
+        <a href="onboarding_modulo_video.html" class="module-item">
+          <div class="mod-num mn-done">✓</div>
+          <div class="mod-info">
+            <h4>Módulo 1: Bienvenida e Introducción al Ecosistema</h4>
+            <p>Visión general de las herramientas de comunicación interna, suites de diseño y tableros ágiles.</p>
+            <div class="mod-tags">
+              <span class="mod-tag mt-vid">🎬 Video interactivo</span>
+              <span class="mod-tag mt-doc" style="background: rgba(76,175,130,0.15); color: var(--verde);">✓ Completado</span>
+            </div>
+          </div>
+          <div class="mod-right">
+            <div class="mod-time">14 min</div>
+            <div class="mod-check" style="color: var(--verde);">✓</div>
+          </div>
+        </a>
+
+        <!-- Mod 2: Reading -->
+        <a href="onboarding_modulo_lectura.html" class="module-item">
+          <div class="mod-num mn-done">✓</div>
+          <div class="mod-info">
+            <h4>Módulo 2: Valores, Políticas y Convenciones de Código</h4>
+            <p>Estandarización de ramas en Git, plantillas de pull request y guías de estilo para commits.</p>
+            <div class="mod-tags">
+              <span class="mod-tag mt-lec">📖 Lectura guiada</span>
+              <span class="mod-tag mt-doc" style="background: rgba(76,175,130,0.15); color: var(--verde);">✓ Completado</span>
+            </div>
+          </div>
+          <div class="mod-right">
+            <div class="mod-time">20 min</div>
+            <div class="mod-check" style="color: var(--verde);">✓</div>
+          </div>
+        </a>
+
+        <!-- Mod 3: Evaluation (Active) -->
+        <a href="onboarding_evaluacion.html" class="module-item active-mod">
+          <div class="mod-num mn-active">3</div>
+          <div class="mod-info">
+            <h4>Módulo 3: Evaluación de Conocimientos y Metodologías</h4>
+            <p>Demuestra tu dominio sobre GitFlow, Jira, reuniones diarias y mejores prácticas para aprobar el curso.</p>
+            <div class="mod-tags">
+              <span class="mod-tag mt-eval">📝 Evaluación activa</span>
+              <span class="mod-tag" style="background: rgba(224, 110, 40, 0.2); color: var(--naranja-cl);">⏳ Pendiente</span>
+            </div>
+          </div>
+          <div class="mod-right">
+            <div class="mod-time">25 min</div>
+            <span class="btn btn-accent" style="padding: 5px 12px; font-size: 11.5px;">Iniciar →</span>
+          </div>
+        </a>
+
+        <!-- Mod 4: Materials -->
+        <a href="onboarding_materiales.html" class="module-item">
+          <div class="mod-num mn-lock">4</div>
+          <div class="mod-info">
+            <h4>Módulo 4: Guías de Instalación y Recursos Clave</h4>
+            <p>Repositorio de plantillas, enlaces útiles y checklists descargables para tu computadora.</p>
+            <div class="mod-tags">
+              <span class="mod-tag mt-doc">📁 Documentación y assets</span>
+            </div>
+          </div>
+          <div class="mod-right">
+            <div class="mod-time">10 min</div>
+            <div class="mod-check" style="color: var(--text-dim);">🔒</div>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- Sidebar Course Info -->
+      <aside class="side-info">
+
+        <div class="info-block">
+          <h5>Instructor Asignado</h5>
+          <div class="instructor-card">
+            <div class="inst-avatar">SV</div>
+            <div class="inst-info">
+              <strong>Sofía Valenzuela</strong>
+              <small>Lead Project Manager & Agile Coach</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-block">
+          <h5>Objetivos de Aprendizaje</h5>
+          <div class="obj-item"><div class="obj-dot"></div><span>Dominar la nomenclatura de ramas en GitFlow.</span></div>
+          <div class="obj-item"><div class="obj-dot"></div><span>Manejar tableros y estados de tareas en Jira.</span></div>
+          <div class="obj-item"><div class="obj-dot"></div><span>Conocer canales y protocolos de incidentes en Slack.</span></div>
+          <div class="obj-item"><div class="obj-dot"></div><span>Configurar variables seguras en entorno local.</span></div>
+        </div>
+
+        <div class="info-block">
+          <h5>Requisitos de Aprobación</h5>
+          <div class="panel" style="padding: 16px; font-size: 13px; line-height: 1.5; color: var(--text-muted);">
+            Para obtener tu constancia digital es necesario completar el 100% de los módulos y obtener al menos <strong>80/100 puntos</strong> en la evaluación final.
+          </div>
+        </div>
+
+      </aside>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

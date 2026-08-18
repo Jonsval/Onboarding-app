@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Mis Cursos</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Filter & Search Bar */
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      flex: 1;
+      min-width: 260px;
+      transition: var(--transition);
+    }
+
+    .search-box:focus-within {
+      border-color: var(--morado-cl);
+      box-shadow: 0 0 0 3px rgba(90, 45, 158, 0.2);
+    }
+
+    .search-box input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 14.5px;
+      width: 100%;
+      font-family: var(--font-main);
+    }
+
+    .search-box input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .search-box span {
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid var(--border-subtle);
+      background: var(--bg-panel);
+      color: var(--text-muted);
+      transition: var(--transition);
+      white-space: nowrap;
+      font-family: var(--font-main);
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(90deg, var(--morado), var(--morado-cl));
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(90, 45, 158, 0.35);
+    }
+
+    .filter-btn:hover:not(.active) {
+      border-color: var(--border-med);
+      color: var(--text-primary);
+    }
+
+    /* Courses Grid */
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 22px;
+    }
+
+    .course-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .course-card:hover {
+      border-color: rgba(90, 45, 158, 0.55);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .course-header {
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 44px;
+      position: relative;
+    }
+
+    .hdr-purple { background: linear-gradient(135deg, #2a1050, #3d1f6e); }
+    .hdr-orange { background: linear-gradient(135deg, #5c2800, #c45c1a); }
+    .hdr-blue   { background: linear-gradient(135deg, #0e1f40, #1e3a6e); }
+    .hdr-teal   { background: linear-gradient(135deg, #083028, #0e5c48); }
+    .hdr-red    { background: linear-gradient(135deg, #3a0a0a, #8b1a1a); }
+
+    .status-pill {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      backdrop-filter: blur(8px);
+    }
+
+    .sp-done { background: rgba(76, 175, 130, 0.3); color: #5de2a5; border: 1px solid rgba(76, 175, 130, 0.5); }
+    .sp-prog { background: rgba(196, 92, 26, 0.35); color: #ff9b5e; border: 1px solid rgba(196, 92, 26, 0.5); }
+    .sp-pend { background: rgba(90, 45, 158, 0.35); color: #c09aff; border: 1px solid rgba(90, 45, 158, 0.5); }
+
+    .course-body {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .course-category {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--naranja-cl);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .course-body h4 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+
+    .course-meta {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .course-meta span {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .prog-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .prog-row span {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .prog-pct {
+      font-size: 13.5px;
+      font-weight: 800;
+    }
+
+    .pct-done { color: var(--verde); }
+    .pct-prog { color: var(--naranja-cl); }
+    .pct-pend { color: var(--morado-glow); }
+
+    .prog-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .prog-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+    }
+
+    .fill-done { background: var(--verde); }
+    .fill-prog { background: var(--naranja-cl); }
+    .fill-pend { background: var(--morado-cl); width: 0%; }
+
+    .btn-course {
+      width: 100%;
+      padding: 11px;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      margin-top: auto;
+      text-align: center;
+      text-decoration: none;
+      transition: var(--transition);
+      display: block;
+      font-family: var(--font-main);
+    }
+
+    .btn-ver  { background: linear-gradient(90deg, var(--morado), var(--morado-cl)); color: #fff; }
+    .btn-ver:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-cont { background: linear-gradient(90deg, var(--naranja), var(--naranja-cl)); color: #fff; box-shadow: 0 4px 12px rgba(196, 92, 26, 0.35); }
+    .btn-cont:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-inic { background: rgba(90, 45, 158, 0.18); color: #c09aff; border: 1px solid rgba(90, 45, 158, 0.35); }
+    .btn-inic:hover { background: var(--morado-cl); color: #fff; }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="onboarding_dashboard.html" class="sidebar-logo">
+      <div class="logo-box">OB</div>
+      <div class="logo-text">
+        <h1>OnboardingApp</h1>
+        <small>v0.2 — Plataforma Activa</small>
+      </div>
+    </a>
+
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <a href="onboarding_dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="onboarding_cursos.html" class="nav-item active">
+        <span class="nav-icon">📚</span> Mis Cursos <span class="badge">3</span>
+      </a>
+      <a href="onboarding_progreso.html" class="nav-item">
+        <span class="nav-icon">📈</span> Mi Progreso
+      </a>
+      <a href="onboarding_materiales.html" class="nav-item">
+        <span class="nav-icon">📁</span> Materiales
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Actividad</div>
+      <a href="onboarding_notificaciones.html" class="nav-item">
+        <span class="nav-icon">🔔</span> Notificaciones <span class="badge notif-badge-count">2</span>
+      </a>
+      <a href="onboarding_constancias.html" class="nav-item">
+        <span class="nav-icon">🎓</span> Constancias
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Cuenta</div>
+      <a href="onboarding_configuracion.html" class="nav-item">
+        <span class="nav-icon">⚙️</span> Configuración
+      </a>
+    </div>
+
+    <div class="sidebar-user" onclick="window.location.href='onboarding_configuracion.html'">
+      <div class="avatar user-avatar-display">AR</div>
+      <div class="user-info">
+        <strong class="user-name-display">Alejandro Ruiz</strong>
+        <small class="user-role-display">Diseñador Junior</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" aria-label="Menú">☰</button>
+        <div>
+          <h2>Mis Cursos</h2>
+          <p>Explora tu catálogo de capacitación y asignaciones</p>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a href="onboarding_busqueda.html" class="search-trigger-btn">
+          <span>🔍 Buscar cursos...</span>
+          <kbd>/</kbd>
+        </a>
+
+        <a href="onboarding_notificaciones.html" class="notif-btn" title="Notificaciones">
+          🔔<div class="notif-dot"></div>
+        </a>
+
+        <div class="profile-dropdown-container">
+          <div class="profile-trigger">
+            <div class="pt-avatar user-avatar-display">AR</div>
+            <span class="pt-name user-name-display">Alejandro Ruiz</span>
+            <span class="pt-caret">▼</span>
+          </div>
+
+          <div class="dropdown-menu">
+            <div class="dd-header">
+              <div class="dd-header-avatar user-avatar-display">AR</div>
+              <div class="dd-header-info">
+                <strong class="user-name-display">Alejandro Ruiz</strong>
+                <small class="user-email-display">alejandro.ruiz@empresa.com</small>
+              </div>
+            </div>
+            <a href="onboarding_configuracion.html" class="dd-item">👤 Mi Perfil</a>
+            <a href="onboarding_constancias.html" class="dd-item">🎓 Mis Constancias</a>
+            <a href="onboarding_progreso.html" class="dd-item">📊 Mi Progreso</a>
+            <a href="onboarding_configuracion.html" class="dd-item">⚙️ Configuración</a>
+            <hr class="dd-divider">
+            <a href="#" class="dd-item dd-logout">🚪 Cerrar Sesión</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- Filter and Search Row -->
+      <div class="filter-row">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="courseSearch" placeholder="Filtrar cursos por título, tema o instructor..." oninput="filterCourses()">
+        </div>
+
+        <div class="filter-group">
+          <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">Todos (5)</button>
+          <button class="filter-btn" data-filter="prog" onclick="setFilter('prog', this)">En Progreso (1)</button>
+          <button class="filter-btn" data-filter="done" onclick="setFilter('done', this)">Completados (2)</button>
+          <button class="filter-btn" data-filter="pend" onclick="setFilter('pend', this)">Pendientes (2)</button>
+        </div>
+      </div>
+
+      <!-- Quick Metrics -->
+      <div class="stats-grid" style="margin-bottom: 24px;">
+        <div class="stat-card">
+          <div class="stat-label">Total Asignados</div>
+          <div class="stat-value">5</div>
+          <div class="stat-sub">Ruta de onboarding</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">En Progreso</div>
+          <div class="stat-value" style="color: var(--naranja-cl)">1</div>
+          <div class="stat-sub">50% avance actual</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Completados</div>
+          <div class="stat-value" style="color: var(--verde)">2</div>
+          <div class="stat-sub">Con constancia emitida</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Por Iniciar</div>
+          <div class="stat-value" style="color: #c09aff">2</div>
+          <div class="stat-sub">Próximos módulos</div>
+        </div>
+      </div>
+
+      <!-- Courses Grid -->
+      <div class="courses-grid" id="coursesContainer">
+        <!-- Rendered by JS or static fallback -->
+      </div>
+
+    </main>
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  let currentFilter = 'all';
+
+  function renderCoursesList() {
+    const container = document.getElementById('coursesContainer');
+    const searchTerm = document.getElementById('courseSearch').value.toLowerCase().trim();
+    const courses = OnboardingApp.courses;
+
+    const filtered = courses.filter(c => {
+      const matchesFilter = (currentFilter === 'all') || (c.status === currentFilter);
+      const matchesSearch = c.title.toLowerCase().includes(searchTerm) || 
+                            c.category.toLowerCase().includes(searchTerm) || 
+                            c.instructor.toLowerCase().includes(searchTerm);
+      return matchesFilter && matchesSearch;
+    });
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div style="font-size: 40px; margin-bottom: 12px;">🔍</div>
+          <h3>No se encontraron cursos</h3>
+          <p>Intenta con otro término de búsqueda o cambia de filtro.</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = filtered.map(c => {
+      let statusBadge = '';
+      let btnHtml = '';
+      let pctClass = 'pct-pend';
+      let fillClass = 'fill-pend';
+
+      if (c.status === 'done') {
+        statusBadge = '<span class="status-pill sp-done">✓ Completado</span>';
+        pctClass = 'pct-done';
+        fillClass = 'fill-done';
+        btnHtml = `<a href="onboarding_constancia_pdf.html?cert=${c.id}" class="btn-course btn-ver">Ver Constancia 🎓</a>`;
+      } else if (c.status === 'prog') {
+        statusBadge = '<span class="status-pill sp-prog">⚡ En Progreso</span>';
+        pctClass = 'pct-prog';
+        fillClass = 'fill-prog';
+        btnHtml = `<a href="onboarding_detalle_curso.html" class="btn-course btn-cont">Continuar Curso →</a>`;
+      } else {
+        statusBadge = '<span class="status-pill sp-pend">⏳ Pendiente</span>';
+        pctClass = 'pct-pend';
+        fillClass = 'fill-pend';
+        btnHtml = `<a href="onboarding_detalle_curso.html" class="btn-course btn-inic">Iniciar Curso</a>`;
+      }
+
+      return `
+        <div class="course-card">
+          <div class="course-header ${c.hdrClass}">
+            ${statusBadge}
+            <span>${c.icon}</span>
+          </div>
+          <div class="course-body">
+            <div class="course-category">${c.category}</div>
+            <h4>${c.title}</h4>
+            <div class="course-meta">
+              <span>⏱️ ${c.duration}</span>
+              <span>📑 ${c.modulesCount} módulos</span>
+            </div>
+            <div class="prog-row">
+              <span>Avance</span>
+              <span class="prog-pct ${pctClass}">${c.progress}%</span>
+            </div>
+            <div class="prog-bar">
+              <div class="prog-fill ${fillClass}" style="width: ${c.progress}%;"></div>
+            </div>
+            ${btnHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderCoursesList();
+  }
+
+  function filterCourses() {
+    renderCoursesList();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    renderCoursesList();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Resultado Evaluación</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Result Hero */
+    .result-hero {
+      background: linear-gradient(110deg, #0a1a0e 0%, #153820 50%, #0e2a18 100%);
+      border: 1px solid rgba(76,175,130,0.35);
+      border-radius: var(--radius-xl);
+      padding: 36px 44px;
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .result-hero.failed {
+      background: linear-gradient(110deg, #240a0a 0%, #3e1212 50%, #290d0d 100%);
+      border-color: rgba(229, 83, 83, 0.4);
+    }
+
+    .result-hero::before {
+      content: '';
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      border: 50px solid rgba(255,255,255,0.03);
+      right: -80px;
+      top: -80px;
+      pointer-events: none;
+    }
+
+    /* Score Circle */
+    .score-circle {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      flex-shrink: 0;
+    }
+
+    .score-circle svg {
+      transform: rotate(-90deg);
+    }
+
+    .sc-bg {
+      fill: none;
+      stroke: rgba(255,255,255,0.08);
+      stroke-width: 10;
+    }
+
+    .sc-fill {
+      fill: none;
+      stroke: var(--verde);
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 44;
+      transition: stroke-dashoffset 1s ease;
+    }
+
+    .score-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      text-align: center;
+    }
+
+    .score-num {
+      font-size: 38px;
+      font-weight: 900;
+      color: var(--verde);
+      line-height: 1;
+    }
+
+    .score-max {
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .result-info {
+      flex: 1;
+    }
+
+    .result-info h2 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .result-info p {
+      font-size: 14.5px;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 14px;
+    }
+
+    .result-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(76,175,130,0.2);
+      border: 1px solid rgba(76,175,130,0.45);
+      color: var(--verde);
+      font-size: 13.5px;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+    }
+
+    .result-stats {
+      display: flex;
+      gap: 20px;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+
+    .rs-item {
+      text-align: center;
+      background: rgba(255,255,255,0.06);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .rs-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .rs-lbl {
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.55);
+      margin-top: 4px;
+    }
+
+    /* Result Grid */
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+
+    .answer-item {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-panel);
+    }
+
+    .answer-item.correct {
+      background: rgba(76,175,130,0.06);
+      border-color: rgba(76,175,130,0.3);
+    }
+
+    .answer-item.wrong {
+      background: rgba(229,83,83,0.06);
+      border-color: rgba(229,83,83,0.3);
+    }
+
+    .ai-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .ai-q {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .ai-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .ab-correct { background: rgba(76,175,130,0.25); color: var(--verde); }
+    .ab-wrong   { background: rgba(229,83,83,0.25);  color: var(--rojo-cl); }
+
+    .ai-ans {
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      margin-top: 6px;
+    }
+
+    .ai-ans.user-ans.correct { background: rgba(76,175,130,0.15); color: var(--verde); }
+    .ai-ans.user-ans.wrong   { background: rgba(229,83,83,0.15);  color: var(--rojo-cl); }
+    .ai-ans.right-ans        { background: rgba(76,175,130,0.08); color: var(--verde); font-style: italic; font-size: 12.5px; }
+
+    .cat-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .cat-row:last-child {
+      border-bottom: none;
+    }
+
+    .cat-name {
+      font-size: 13px;
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .cat-bar-wrap {
+      width: 100px;
+    }
+
+    .cat-bar {
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .cat-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+    }
+
+    .cat-score {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--verde);
+      width: 40px;
+      text-align: right;
+    }
+
+    @media (max-width: 960px) {
+      .result-hero { flex-direction: column; text-align: center; }
+      .result-stats { justify-content: center; }
+      .result-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="onboarding_dashboard.html" class="sidebar-logo">
+      <div class="logo-box">OB</div>
+      <div class="logo-text">
+        <h1>OnboardingApp</h1>
+        <small>v0.2 — Plataforma Activa</small>
+      </div>
+    </a>
+
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <a href="onboarding_dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="onboarding_cursos.html" class="nav-item active">
+        <span class="nav-icon">📚</span> Mis Cursos <span class="badge">3</span>
+      </a>
+      <a href="onboarding_progreso.html" class="nav-item">
+        <span class="nav-icon">📈</span> Mi Progreso
+      </a>
+      <a href="onboarding_materiales.html" class="nav-item">
+        <span class="nav-icon">📁</span> Materiales
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Actividad</div>
+      <a href="onboarding_notificaciones.html" class="nav-item">
+        <span class="nav-icon">🔔</span> Notificaciones <span class="badge notif-badge-count">2</span>
+      </a>
+      <a href="onboarding_constancias.html" class="nav-item">
+        <span class="nav-icon">🎓</span> Constancias
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Cuenta</div>
+      <a href="onboarding_configuracion.html" class="nav-item">
+        <span class="nav-icon">⚙️</span> Configuración
+      </a>
+    </div>
+
+    <div class="sidebar-user" onclick="window.location.href='onboarding_configuracion.html'">
+      <div class="avatar user-avatar-display">AR</div>
+      <div class="user-info">
+        <strong class="user-name-display">Alejandro Ruiz</strong>
+        <small class="user-role-display">Diseñador Junior</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" aria-label="Menú">☰</button>
+        <div class="breadcrumb">
+          <a href="onboarding_cursos.html">Mis Cursos</a>
+          <span class="sep">›</span>
+          <a href="onboarding_detalle_curso.html">Herramientas y Metodologías</a>
+          <span class="sep">›</span>
+          <span>Resultado de Evaluación</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a href="onboarding_notificaciones.html" class="notif-btn" title="Notificaciones">
+          🔔<div class="notif-dot"></div>
+        </a>
+
+        <div class="profile-dropdown-container">
+          <div class="profile-trigger">
+            <div class="pt-avatar user-avatar-display">AR</div>
+            <span class="pt-name user-name-display">Alejandro Ruiz</span>
+            <span class="pt-caret">▼</span>
+          </div>
+
+          <div class="dropdown-menu">
+            <div class="dd-header">
+              <div class="dd-header-avatar user-avatar-display">AR</div>
+              <div class="dd-header-info">
+                <strong class="user-name-display">Alejandro Ruiz</strong>
+                <small class="user-email-display">alejandro.ruiz@empresa.com</small>
+              </div>
+            </div>
+            <a href="onboarding_configuracion.html" class="dd-item">👤 Mi Perfil</a>
+            <a href="onboarding_constancias.html" class="dd-item">🎓 Mis Constancias</a>
+            <a href="onboarding_progreso.html" class="dd-item">📊 Mi Progreso</a>
+            <a href="onboarding_configuracion.html" class="dd-item">⚙️ Configuración</a>
+            <hr class="dd-divider">
+            <a href="#" class="dd-item dd-logout">🚪 Cerrar Sesión</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- Result Hero -->
+      <div class="result-hero" id="resultHero">
+        <div class="score-circle">
+          <svg viewBox="0 0 160 160" width="140" height="140">
+            <circle class="sc-bg" cx="80" cy="80" r="70"/>
+            <circle class="sc-fill" id="scoreCircleFill" cx="80" cy="80" r="70"/>
+          </svg>
+          <div class="score-text">
+            <div class="score-num" id="scoreNumDisplay">90</div>
+            <div class="score-max">/ 100</div>
+          </div>
+        </div>
+
+        <div class="result-info">
+          <h2 id="resultTitle">¡Evaluación Aprobada! 🎉</h2>
+          <p id="resultDesc">Obtuviste una calificación sobresaliente en la evaluación de Herramientas y Metodologías de Trabajo.</p>
+          <div class="result-badge" id="resultBadge">✓ Aprobado · Superaste el mínimo de 80 pts</div>
+        </div>
+
+        <div class="result-stats">
+          <div class="rs-item">
+            <div class="rs-val" id="correctCountDisplay" style="color:var(--verde)">9</div>
+            <div class="rs-lbl">Correctas</div>
+          </div>
+          <div class="rs-item">
+            <div class="rs-val" id="wrongCountDisplay" style="color:var(--rojo-cl)">1</div>
+            <div class="rs-lbl">Incorrectas</div>
+          </div>
+          <div class="rs-item">
+            <div class="rs-val" id="timeUsedDisplay">18:22</div>
+            <div class="rs-lbl">Tiempo usado</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Layout -->
+      <div class="result-grid">
+
+        <!-- Question Review Panel -->
+        <div class="panel">
+          <h3 style="font-size: 16px; font-weight: 800; color: var(--text-white); margin-bottom: 18px;">
+            Revisión Detallada de Respuestas
+          </h3>
+
+          <div id="answersListContainer">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Right Side Stats & Actions -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+
+          <!-- Category Breakdown -->
+          <div class="panel">
+            <h4 style="font-size: 14px; font-weight: 800; color: var(--text-white); margin-bottom: 16px;">
+              Desglose por Competencia
+            </h4>
+
+            <div class="cat-row">
+              <div class="cat-name">Git y Versiones</div>
+              <div class="cat-bar-wrap"><div class="cat-bar"><div class="cat-fill" style="width:100%; background:var(--verde)"></div></div></div>
+              <div class="cat-score">100%</div>
+            </div>
+
+            <div class="cat-row">
+              <div class="cat-name">Jira y Confluence</div>
+              <div class="cat-bar-wrap"><div class="cat-bar"><div class="cat-fill" style="width:100%; background:var(--verde)"></div></div></div>
+              <div class="cat-score">100%</div>
+            </div>
+
+            <div class="cat-row">
+              <div class="cat-name">Slack y Reuniones</div>
+              <div class="cat-bar-wrap"><div class="cat-bar"><div class="cat-fill" style="width:100%; background:var(--verde)"></div></div></div>
+              <div class="cat-score">100%</div>
+            </div>
+
+            <div class="cat-row">
+              <div class="cat-name">Entorno Local</div>
+              <div class="cat-bar-wrap"><div class="cat-bar"><div class="cat-fill" style="width:75%; background:var(--naranja-cl)"></div></div></div>
+              <div class="cat-score" style="color:var(--naranja-cl)">75%</div>
+            </div>
+          </div>
+
+          <!-- Next Steps Action Card -->
+          <div class="panel" style="text-align: center;">
+            <h4 style="font-size: 15px; font-weight: 800; color: var(--text-white); margin-bottom: 10px;">
+              ¡Felicidades por tu logro!
+            </h4>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
+              Has completado todos los requisitos de este curso. Puedes reclamar tu insignia especial o descargar tu constancia digital.
+            </p>
+
+            <a href="onboarding_logro.html" class="btn btn-accent" style="width: 100%; margin-bottom: 10px;">
+              🏆 Reclamar Insignia de Logro
+            </a>
+
+            <a href="onboarding_constancia_pdf.html?cert=herramientas" class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;">
+              🎓 Ver Constancia Digital (PDF)
+            </a>
+
+            <a href="onboarding_evaluacion.html" class="btn btn-ghost" style="width: 100%; font-size: 12.5px;">
+              ↩ Reintentar Evaluación
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const result = OnboardingApp.evalResult || {
+      score: 90,
+      passed: true,
+      correctCount: 9,
+      wrongCount: 1,
+      timeUsed: '18:22',
+      breakdown: [
+        {
+          id: 1,
+          question: '1. ¿Cuál es la rama principal de producción según nuestro flujo de GitFlow corporativo?',
+          isCorrect: true,
+          userAnswerText: 'main',
+          correctAnswerText: 'main',
+          explanation: 'La rama protegida de producción siempre es main.'
+        },
+        {
+          id: 2,
+          question: '2. ¿Qué convención de prefijo se debe usar en los commits para agregar una nueva funcionalidad?',
+          isCorrect: true,
+          userAnswerText: 'feat:',
+          correctAnswerText: 'feat:',
+          explanation: 'Convencional commits utiliza feat: para nuevas funcionalidades.'
+        },
+        {
+          id: 3,
+          question: '3. ¿Cuál es el límite máximo recomendado de líneas modificadas por Pull Request?',
+          isCorrect: false,
+          userAnswerText: '800 líneas',
+          correctAnswerText: '400 líneas',
+          explanation: 'Se recomienda un máximo de 400 líneas para agilizar revisiones.'
+        },
+        {
+          id: 4,
+          question: '4. ¿Cuál es el formato correcto para nombrar una rama de nueva funcionalidad?',
+          isCorrect: true,
+          userAnswerText: 'feature/[ticket-id]-descripcion-breve',
+          correctAnswerText: 'feature/[ticket-id]-descripcion-breve',
+          explanation: 'Formato estándar: feature/DES-142-onboarding-form.'
+        },
+        {
+          id: 5,
+          question: '5. ¿Qué herramienta oficial utilizamos para documentar acuerdos de arquitectura?',
+          isCorrect: true,
+          userAnswerText: 'Confluence',
+          correctAnswerText: 'Confluence',
+          explanation: 'Confluence es la base de conocimiento oficial.'
+        }
+      ]
+    };
+
+    // Update Hero elements
+    const hero = document.getElementById('resultHero');
+    const scoreNum = document.getElementById('scoreNumDisplay');
+    const circleFill = document.getElementById('scoreCircleFill');
+    const title = document.getElementById('resultTitle');
+    const desc = document.getElementById('resultDesc');
+    const badge = document.getElementById('resultBadge');
+
+    scoreNum.textContent = result.score;
+    document.getElementById('correctCountDisplay').textContent = result.correctCount;
+    document.getElementById('wrongCountDisplay').textContent = result.wrongCount;
+    document.getElementById('timeUsedDisplay').textContent = result.timeUsed;
+
+    // Stroke Dashoffset (440 is perimeter for r=70: 2*pi*70 ~= 439.8)
+    const offset = 440 - (440 * (result.score / 100));
+    circleFill.style.strokeDashoffset = offset;
+
+    if (!result.passed) {
+      hero.classList.add('failed');
+      circleFill.style.stroke = 'var(--rojo)';
+      scoreNum.style.color = 'var(--rojo-cl)';
+      title.textContent = 'Evaluación No Aprobada ⚠️';
+      desc.textContent = 'No alcanzaste el mínimo aprobatorio de 80 puntos. Te recomendamos repasar los módulos y reintentar.';
+      badge.textContent = '✗ No aprobado · Reintento disponible';
+      badge.style.background = 'rgba(229,83,83,0.2)';
+      badge.style.borderColor = 'rgba(229,83,83,0.4)';
+      badge.style.color = 'var(--rojo-cl)';
+    }
+
+    // Render Answers Breakdown
+    const container = document.getElementById('answersListContainer');
+    container.innerHTML = result.breakdown.map((item, idx) => {
+      if (item.isCorrect) {
+        return `
+          <div class="answer-item correct">
+            <div class="ai-top">
+              <div class="ai-q">${item.question}</div>
+              <span class="ai-badge ab-correct">✓ Correcta</span>
+            </div>
+            <div class="ai-ans user-ans correct">✓ Tu respuesta: ${item.userAnswerText}</div>
+          </div>
+        `;
+      } else {
+        return `
+          <div class="answer-item wrong">
+            <div class="ai-top">
+              <div class="ai-q">${item.question}</div>
+              <span class="ai-badge ab-wrong">✗ Incorrecta</span>
+            </div>
+            <div class="ai-ans user-ans wrong">✗ Tu respuesta: ${item.userAnswerText}</div>
+            <div class="ai-ans right-ans">✓ Respuesta correcta: ${item.correctAnswerText}</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">💡 ${item.explanation}</p>
+          </div>
+        `;
+      }
+    }).join('');
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Constancias</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+    }
+
+    /* Certificate Cards */
+    .cert-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 20px;
+      transition: var(--transition);
+    }
+
+    .cert-card:hover {
+      border-color: rgba(76, 175, 130, 0.45);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .cert-preview {
+      height: 150px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .cp-purple { background: linear-gradient(120deg, #1b0e33 0%, #3d1f6e 60%, #1e3a6e 100%); }
+    .cp-blue   { background: linear-gradient(120deg, #0e1f40 0%, #1e3a6e 60%, #2a1050 100%); }
+    .cp-teal   { background: linear-gradient(120deg, #083028 0%, #0e5c48 60%, #0e3040 100%); }
+
+    .cert-frame-mini {
+      width: 290px;
+      height: 110px;
+      border: 2px solid rgba(201,168,76,0.3);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      position: relative;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .cert-frame-mini::before {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      top: 4px;
+      left: 4px;
+      border-top: 2px solid var(--dorado);
+      border-left: 2px solid var(--dorado);
+    }
+
+    .cert-frame-mini::after {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      bottom: 4px;
+      right: 4px;
+      border-bottom: 2px solid var(--dorado);
+      border-right: 2px solid var(--dorado);
+    }
+
+    .cf-logo {
+      font-size: 10px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .cf-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      text-align: center;
+      padding: 0 12px;
+    }
+
+    .cf-name {
+      font-size: 11px;
+      color: var(--dorado-cl);
+    }
+
+    .cert-badge-overlay {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(76, 175, 130, 0.25);
+      border: 1px solid rgba(76, 175, 130, 0.5);
+      color: var(--verde);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+    }
+
+    .cert-body {
+      padding: 20px 24px;
+    }
+
+    .cert-body h4 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 6px;
+    }
+
+    .cert-meta {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .cert-meta span {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .cert-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 960px) {
+      .main-layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="onboarding_dashboard.html" class="sidebar-logo">
+      <div class="logo-box">OB</div>
+      <div class="logo-text">
+        <h1>OnboardingApp</h1>
+        <small>v0.2 — Plataforma Activa</small>
+      </div>
+    </a>
+
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <a href="onboarding_dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="onboarding_cursos.html" class="nav-item">
+        <span class="nav-icon">📚</span> Mis Cursos <span class="badge">3</span>
+      </a>
+      <a href="onboarding_progreso.html" class="nav-item">
+        <span class="nav-icon">📈</span> Mi Progreso
+      </a>
+      <a href="onboarding_materiales.html" class="nav-item">
+        <span class="nav-icon">📁</span> Materiales
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Actividad</div>
+      <a href="onboarding_notificaciones.html" class="nav-item">
+        <span class="nav-icon">🔔</span> Notificaciones <span class="badge notif-badge-count">2</span>
+      </a>
+      <a href="onboarding_constancias.html" class="nav-item active">
+        <span class="nav-icon">🎓</span> Constancias
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Cuenta</div>
+      <a href="onboarding_configuracion.html" class="nav-item">
+        <span class="nav-icon">⚙️</span> Configuración
+      </a>
+    </div>
+
+    <div class="sidebar-user" onclick="window.location.href='onboarding_configuracion.html'">
+      <div class="avatar user-avatar-display">AR</div>
+      <div class="user-info">
+        <strong class="user-name-display">Alejandro Ruiz</strong>
+        <small class="user-role-display">Diseñador Junior</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" aria-label="Menú">☰</button>
+        <div>
+          <h2>Constancias y Certificados</h2>
+          <p>Tus credenciales y diplomas oficiales emitidos por la organización</p>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a href="onboarding_busqueda.html" class="search-trigger-btn">
+          <span>🔍 Buscar...</span>
+          <kbd>/</kbd>
+        </a>
+
+        <a href="onboarding_notificaciones.html" class="notif-btn" title="Notificaciones">
+          🔔<div class="notif-dot"></div>
+        </a>
+
+        <div class="profile-dropdown-container">
+          <div class="profile-trigger">
+            <div class="pt-avatar user-avatar-display">AR</div>
+            <span class="pt-name user-name-display">Alejandro Ruiz</span>
+            <span class="pt-caret">▼</span>
+          </div>
+
+          <div class="dropdown-menu">
+            <div class="dd-header">
+              <div class="dd-header-avatar user-avatar-display">AR</div>
+              <div class="dd-header-info">
+                <strong class="user-name-display">Alejandro Ruiz</strong>
+                <small class="user-email-display">alejandro.ruiz@empresa.com</small>
+              </div>
+            </div>
+            <a href="onboarding_configuracion.html" class="dd-item">👤 Mi Perfil</a>
+            <a href="onboarding_constancias.html" class="dd-item">🎓 Mis Constancias</a>
+            <a href="onboarding_progreso.html" class="dd-item">📊 Mi Progreso</a>
+            <a href="onboarding_configuracion.html" class="dd-item">⚙️ Configuración</a>
+            <hr class="dd-divider">
+            <a href="#" class="dd-item dd-logout">🚪 Cerrar Sesión</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- Stats Row -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Constancias Obtenidas</div>
+          <div class="stat-value" style="color: var(--verde)">2</div>
+          <div class="stat-sub">100% verificadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">En Progreso</div>
+          <div class="stat-value" style="color: var(--naranja-cl)">1</div>
+          <div class="stat-sub">Herramientas y metodologías</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Por Desbloquear</div>
+          <div class="stat-value" style="color: #c09aff">2</div>
+          <div class="stat-sub">Malla técnica pendiente</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Validez</div>
+          <div class="stat-value" style="color: var(--dorado-cl)">Oficial</div>
+          <div class="stat-sub">Con código QR único</div>
+        </div>
+      </div>
+
+      <!-- Main Layout -->
+      <div class="main-layout">
+
+        <!-- Left List -->
+        <div>
+          <div class="section-title">
+            <span>Mis Constancias Acreditadas</span>
+            <span style="font-size: 13px; color: var(--text-muted); font-weight: 500;">2 constancias activas</span>
+          </div>
+
+          <!-- Cert 1 -->
+          <div class="cert-card">
+            <div class="cert-preview cp-purple">
+              <span class="cert-badge-overlay">✓ Acreditada</span>
+              <div class="cert-frame-mini">
+                <div class="cf-logo">CONSTANCIA OFICIAL</div>
+                <div class="cf-title">Cultura y Valores de la Empresa</div>
+                <div class="cf-name user-name-display">Alejandro Ruiz</div>
+              </div>
+            </div>
+            <div class="cert-body">
+              <h4>Cultura y Valores de la Empresa</h4>
+              <div class="cert-meta">
+                <span>📅 Emitida: 12 de Agosto, 2026</span>
+                <span>🔑 Folio: CERT-OB-2026-0089</span>
+                <span>👩‍🏫 Mariana Silva (Talent Director)</span>
+              </div>
+              <div class="cert-actions">
+                <a href="onboarding_constancia_pdf.html?cert=cultura" class="btn btn-primary" style="font-size: 13px;">
+                  📄 Ver y Descargar PDF
+                </a>
+                <button class="btn btn-secondary" onclick="verifyCert('CERT-OB-2026-0089', 'Cultura y Valores')" style="font-size: 13px;">
+                  🔍 Verificar Folio
+                </button>
+                <button class="btn btn-ghost" onclick="shareCert('Cultura y Valores')" style="font-size: 13px;">
+                  🔗 Compartir
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cert 2 -->
+          <div class="cert-card">
+            <div class="cert-preview cp-blue">
+              <span class="cert-badge-overlay">✓ Acreditada</span>
+              <div class="cert-frame-mini">
+                <div class="cf-logo">CONSTANCIA OFICIAL</div>
+                <div class="cf-title">Seguridad de la Información y Políticas</div>
+                <div class="cf-name user-name-display">Alejandro Ruiz</div>
+              </div>
+            </div>
+            <div class="cert-body">
+              <h4>Seguridad de la Información y Políticas</h4>
+              <div class="cert-meta">
+                <span>📅 Emitida: 14 de Agosto, 2026</span>
+                <span>🔑 Folio: CERT-OB-2026-0104</span>
+                <span>👨‍🏫 Carlos Mendoza (CISO)</span>
+              </div>
+              <div class="cert-actions">
+                <a href="onboarding_constancia_pdf.html?cert=seguridad" class="btn btn-primary" style="font-size: 13px;">
+                  📄 Ver y Descargar PDF
+                </a>
+                <button class="btn btn-secondary" onclick="verifyCert('CERT-OB-2026-0104', 'Seguridad de la Información')" style="font-size: 13px;">
+                  🔍 Verificar Folio
+                </button>
+                <button class="btn btn-ghost" onclick="shareCert('Seguridad de la Información')" style="font-size: 13px;">
+                  🔗 Compartir
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cert 3 (In Progress / Ready) -->
+          <div class="cert-card" style="border-style: dashed; border-color: rgba(196,92,26,0.5);">
+            <div class="cert-preview cp-teal">
+              <span class="cert-badge-overlay" style="background: rgba(196,92,26,0.3); color: var(--naranja-cl); border-color: rgba(196,92,26,0.5);">⚡ En Progreso (50%)</span>
+              <div class="cert-frame-mini">
+                <div class="cf-logo">CONSTANCIA EN PROCESO</div>
+                <div class="cf-title">Herramientas y Metodologías de Trabajo</div>
+                <div class="cf-name user-name-display">Alejandro Ruiz</div>
+              </div>
+            </div>
+            <div class="cert-body">
+              <h4>Herramientas y Metodologías de Trabajo</h4>
+              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+                Aprueba la evaluación final con al menos 80 puntos para desbloquear y generar tu constancia oficial.
+              </p>
+              <div class="cert-actions">
+                <a href="onboarding_evaluacion.html" class="btn btn-accent" style="font-size: 13px;">
+                  📝 Realizar Evaluación →
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Side Panel -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+
+          <!-- Verification Box -->
+          <div class="panel">
+            <h4 style="font-size: 15px; font-weight: 800; color: var(--text-white); margin-bottom: 8px;">
+              Validador de Constancias
+            </h4>
+            <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px;">
+              Ingresa cualquier folio institucional para verificar su autenticidad.
+            </p>
+            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+              <input type="text" id="verifyInput" placeholder="CERT-OB-2026-XXXX" class="form-input" style="padding: 10px 12px; font-size: 13px;">
+              <button class="btn btn-primary" onclick="handleCustomVerify()" style="padding: 10px 16px; font-size: 13px;">Validar</button>
+            </div>
+          </div>
+
+          <!-- FAQ & Info -->
+          <div class="panel">
+            <h4 style="font-size: 15px; font-weight: 800; color: var(--text-white); margin-bottom: 14px;">
+              Información de Validez
+            </h4>
+            <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6; display: flex; flex-direction: column; gap: 10px;">
+              <p>🔒 <strong>Criptográficamente firmadas:</strong> Cada diploma cuenta con un hash único registrado en el sistema institucional.</p>
+              <p>🖨️ <strong>Formato de Impresión:</strong> Diseñadas en alta resolución para descarga directa o impresión física apaisada.</p>
+              <p>🌐 <strong>Compartibles:</strong> Aptas para agregar a tu perfil de LinkedIn en la sección de Licencias y Certificaciones.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  function verifyCert(folio, courseName) {
+    OnboardingApp.showToast('Credencial Verificada', `El folio ${folio} para "${courseName}" es auténtico y está vigente.`, 'success');
+  }
+
+  function shareCert(courseName) {
+    OnboardingApp.showToast('Enlace Copiado', `Enlace de verificación de "${courseName}" copiado para compartir.`, 'info');
+  }
+
+  function handleCustomVerify() {
+    const val = document.getElementById('verifyInput').value.trim();
+    if (!val) {
+      OnboardingApp.showToast('Atención', 'Ingresa un folio de constancia.', 'warning');
+      return;
+    }
+    OnboardingApp.showToast('Validación exitosa', `El folio ${val} corresponde a un certificado válido y emitido.`, 'success');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Materiales y Recursos</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .search-box input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 14.5px;
+      width: 100%;
+      font-family: var(--font-main);
+    }
+
+    .search-box input::placeholder { color: var(--text-dim); }
+
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid var(--border-subtle);
+      background: var(--bg-panel);
+      color: var(--text-muted);
+      transition: var(--transition);
+      font-family: var(--font-main);
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(90deg, var(--morado), var(--morado-cl));
+      color: #fff;
+      border-color: transparent;
+    }
+
+    /* Featured Cards */
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .featured-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .featured-card:hover {
+      border-color: rgba(90, 45, 158, 0.5);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .fc-header {
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      position: relative;
+    }
+
+    .fch-blue   { background: linear-gradient(135deg, #0e1f40, #1e3a6e); }
+    .fch-purple { background: linear-gradient(135deg, #2a1050, #3d1f6e); }
+    .fch-orange { background: linear-gradient(135deg, #5c2800, #c45c1a); }
+
+    .fc-new {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--naranja);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+    }
+
+    .fc-body {
+      padding: 16px 20px;
+      flex: 1;
+    }
+
+    .fc-body h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 4px;
+    }
+
+    .fc-body p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .fc-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .fc-type {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+    }
+
+    .ft-pdf { background: rgba(196, 92, 26, 0.2); color: var(--naranja-cl); }
+    .ft-vid { background: rgba(30, 58, 110, 0.4); color: #7eaaff; }
+    .ft-ppt { background: rgba(61, 31, 110, 0.35); color: #c09aff; }
+
+    /* Materials List */
+    .mat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mat-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      transition: var(--transition);
+    }
+
+    .mat-item:hover {
+      border-color: var(--border-med);
+      transform: translateX(2px);
+    }
+
+    .mat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--bg-input);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .mat-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mat-info h4 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .mat-info p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .mat-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12.5px;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="onboarding_dashboard.html" class="sidebar-logo">
+      <div class="logo-box">OB</div>
+      <div class="logo-text">
+        <h1>OnboardingApp</h1>
+        <small>v0.2 — Plataforma Activa</small>
+      </div>
+    </a>
+
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <a href="onboarding_dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="onboarding_cursos.html" class="nav-item">
+        <span class="nav-icon">📚</span> Mis Cursos <span class="badge">3</span>
+      </a>
+      <a href="onboarding_progreso.html" class="nav-item">
+        <span class="nav-icon">📈</span> Mi Progreso
+      </a>
+      <a href="onboarding_materiales.html" class="nav-item active">
+        <span class="nav-icon">📁</span> Materiales
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Actividad</div>
+      <a href="onboarding_notificaciones.html" class="nav-item">
+        <span class="nav-icon">🔔</span> Notificaciones <span class="badge notif-badge-count">2</span>
+      </a>
+      <a href="onboarding_constancias.html" class="nav-item">
+        <span class="nav-icon">🎓</span> Constancias
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Cuenta</div>
+      <a href="onboarding_configuracion.html" class="nav-item">
+        <span class="nav-icon">⚙️</span> Configuración
+      </a>
+    </div>
+
+    <div class="sidebar-user" onclick="window.location.href='onboarding_configuracion.html'">
+      <div class="avatar user-avatar-display">AR</div>
+      <div class="user-info">
+        <strong class="user-name-display">Alejandro Ruiz</strong>
+        <small class="user-role-display">Diseñador Junior</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" aria-label="Menú">☰</button>
+        <div>
+          <h2>Materiales y Recursos</h2>
+          <p>Documentación técnica, manuales oficiales y plantillas descargables</p>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a href="onboarding_busqueda.html" class="search-trigger-btn">
+          <span>🔍 Buscar materiales...</span>
+          <kbd>/</kbd>
+        </a>
+
+        <a href="onboarding_notificaciones.html" class="notif-btn" title="Notificaciones">
+          🔔<div class="notif-dot"></div>
+        </a>
+
+        <div class="profile-dropdown-container">
+          <div class="profile-trigger">
+            <div class="pt-avatar user-avatar-display">AR</div>
+            <span class="pt-name user-name-display">Alejandro Ruiz</span>
+            <span class="pt-caret">▼</span>
+          </div>
+
+          <div class="dropdown-menu">
+            <div class="dd-header">
+              <div class="dd-header-avatar user-avatar-display">AR</div>
+              <div class="dd-header-info">
+                <strong class="user-name-display">Alejandro Ruiz</strong>
+                <small class="user-email-display">alejandro.ruiz@empresa.com</small>
+              </div>
+            </div>
+            <a href="onboarding_configuracion.html" class="dd-item">👤 Mi Perfil</a>
+            <a href="onboarding_constancias.html" class="dd-item">🎓 Mis Constancias</a>
+            <a href="onboarding_progreso.html" class="dd-item">📊 Mi Progreso</a>
+            <a href="onboarding_configuracion.html" class="dd-item">⚙️ Configuración</a>
+            <hr class="dd-divider">
+            <a href="#" class="dd-item dd-logout">🚪 Cerrar Sesión</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="matSearch" placeholder="Buscar por nombre, formato o descripción..." oninput="filterMaterials()">
+        </div>
+
+        <div class="filter-group">
+          <button class="filter-btn active" data-type="all" onclick="setTypeFilter('all', this)">Todos</button>
+          <button class="filter-btn" data-type="PDF" onclick="setTypeFilter('PDF', this)">PDFs</button>
+          <button class="filter-btn" data-type="PPT" onclick="setTypeFilter('PPT', this)">Plantillas PPT</button>
+          <button class="filter-btn" data-type="DOC" onclick="setTypeFilter('DOC', this)">Guías DOC</button>
+          <button class="filter-btn" data-type="VID" onclick="setTypeFilter('VID', this)">Videos</button>
+        </div>
+      </div>
+
+      <!-- Section: Destacados -->
+      <h3 style="font-size: 15px; font-weight: 800; color: var(--text-white); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.6px;">
+        Recursos Más Utilizados
+      </h3>
+
+      <div class="featured-grid">
+        
+        <div class="featured-card" onclick="OnboardingApp.downloadMockFile('Guia_GitFlow_2026.pdf')">
+          <div class="fc-header fch-blue">
+            <span class="fc-new">Nuevo</span>
+            <span>📄</span>
+          </div>
+          <div class="fc-body">
+            <h4>Guía de Convenciones Git y Flujo GitFlow</h4>
+            <p>Commits semánticos, ramas y buenas prácticas de Pull Requests.</p>
+          </div>
+          <div class="fc-footer">
+            <span class="fc-type ft-pdf">PDF · 2.4 MB</span>
+            <span class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;">Descargar</span>
+          </div>
+        </div>
+
+        <div class="featured-card" onclick="OnboardingApp.downloadMockFile('Manual_Sistema_Diseno_UI.pdf')">
+          <div class="fc-header fch-purple">
+            <span>🎨</span>
+          </div>
+          <div class="fc-body">
+            <h4>Manual de Identidad y Sistema de Diseño UI</h4>
+            <p>Tokens de color, tipografía, componentes y librerías en Figma.</p>
+          </div>
+          <div class="fc-footer">
+            <span class="fc-type ft-pdf">PDF · 14.8 MB</span>
+            <span class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;">Descargar</span>
+          </div>
+        </div>
+
+        <div class="featured-card" onclick="OnboardingApp.downloadMockFile('Plantilla_Reporte_Sprints.pptx')">
+          <div class="fc-header fch-orange">
+            <span>📊</span>
+          </div>
+          <div class="fc-body">
+            <h4>Plantilla de Minutas y Reporte de Sprints</h4>
+            <p>Estructura oficial para Sprint Review y Retrospectivas.</p>
+          </div>
+          <div class="fc-footer">
+            <span class="fc-type ft-ppt">PPT · 5.1 MB</span>
+            <span class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;">Descargar</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Section: List -->
+      <h3 style="font-size: 15px; font-weight: 800; color: var(--text-white); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.6px;">
+        Catálogo Completo de Materiales
+      </h3>
+
+      <div class="mat-list" id="matListContainer">
+        <!-- Rendered by JS -->
+      </div>
+
+    </main>
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  let currentType = 'all';
+
+  function renderMaterials() {
+    const container = document.getElementById('matListContainer');
+    const search = document.getElementById('matSearch').value.toLowerCase().trim();
+    const materials = OnboardingApp.materials;
+
+    const filtered = materials.filter(m => {
+      const matchesType = (currentType === 'all') || (m.type === currentType);
+      const matchesSearch = m.title.toLowerCase().includes(search) || m.desc.toLowerCase().includes(search);
+      return matchesType && matchesSearch;
+    });
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+          <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
+          <p>No se encontraron materiales que coincidan con la búsqueda.</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = filtered.map(m => `
+      <div class="mat-item">
+        <div class="mat-icon">${m.icon}</div>
+        <div class="mat-info">
+          <h4>${m.title}</h4>
+          <p>${m.desc}</p>
+        </div>
+        <div class="mat-meta">
+          <span class="fc-type ${m.tagClass}">${m.type} · ${m.size}</span>
+          <span>📅 ${m.updated}</span>
+          <button class="btn btn-secondary" onclick="OnboardingApp.downloadMockFile('${m.title.replace(/\\s+/g, '_')}.${m.type.toLowerCase()}')" style="font-size: 12px; padding: 6px 14px;">
+            ⬇️ Descargar
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function setTypeFilter(type, btn) {
+    currentType = type;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderMaterials();
+  }
+
+  function filterMaterials() {
+    renderMaterials();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMaterials();
+  });
+</script>
+</body>
+</html>

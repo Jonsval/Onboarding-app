@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Módulo Lectura</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .body-wrap {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .reading-col {
+      flex: 1;
+      overflow-y: auto;
+      min-width: 0;
+      position: relative;
+    }
+
+    /* Sticky Scroll Progress Bar */
+    .reading-progress-bar {
+      position: sticky;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      z-index: 50;
+    }
+
+    .reading-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--morado-cl), var(--naranja-cl));
+      transition: width 0.1s ease;
+    }
+
+    /* Document Header */
+    .doc-header {
+      background: linear-gradient(110deg, #0e1a30 0%, #1a2a4a 60%, #2a1050 100%);
+      padding: 40px 48px 32px;
+      border-bottom: 1px solid var(--border-subtle);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .doc-header::after {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 50px solid rgba(255,255,255,0.04);
+      right: -60px;
+      top: -80px;
+      pointer-events: none;
+    }
+
+    .doc-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(61,31,110,0.45);
+      color: #c09aff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: var(--radius-full);
+      margin-bottom: 14px;
+      border: 1px solid rgba(90, 45, 158, 0.4);
+    }
+
+    .doc-header h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .doc-meta {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .doc-meta span {
+      font-size: 13px;
+      color: rgba(255,255,255,0.65);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Reader Controls */
+    .reader-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 48px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .font-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .font-btn {
+      padding: 4px 10px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    /* Article Body */
+    .article-body {
+      padding: 40px 48px;
+      max-width: 920px;
+      margin: 0 auto;
+      line-height: 1.8;
+      font-size: 15.5px;
+      color: var(--text-secondary);
+    }
+
+    .article-body h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-top: 36px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 8px;
+    }
+
+    .article-body h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--naranja-cl);
+      margin-top: 24px;
+      margin-bottom: 10px;
+    }
+
+    .article-body p {
+      margin-bottom: 16px;
+    }
+
+    .code-block {
+      background: #0b0b14;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      color: #9feaf9;
+      margin: 18px 0;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+
+    .callout {
+      background: rgba(90, 45, 158, 0.12);
+      border-left: 4px solid var(--morado-cl);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 18px 22px;
+      margin: 24px 0;
+      font-size: 14.5px;
+    }
+
+    .callout-success {
+      background: rgba(76, 175, 130, 0.12);
+      border-left-color: var(--verde);
+    }
+
+    /* Playlist Sidebar */
+    .playlist-sidebar {
+      width: 340px;
+      background: var(--bg-sidebar);
+      border-left: 1px solid var(--border-subtle);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .playlist-item {
+      display: flex;
+      gap: 12px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 10px;
+      text-decoration: none;
+      color: inherit;
+      transition: var(--transition);
+    }
+
+    .playlist-item:hover {
+      border-color: var(--border-med);
+      transform: translateX(2px);
+    }
+
+    .playlist-item.active {
+      border-color: var(--morado-cl);
+      background: rgba(61, 31, 110, 0.25);
+    }
+
+    .pi-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .pi-done { background: rgba(76, 175, 130, 0.2); color: var(--verde); }
+    .pi-curr { background: var(--morado-cl); color: #fff; }
+    .pi-pend { background: rgba(255, 255, 255, 0.05); color: var(--text-dim); }
+
+    .pi-info h5 {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .pi-info small {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 960px) {
+      .body-wrap { flex-direction: column; }
+      .playlist-sidebar { width: 100%; border-left: none; border-top: 1px solid var(--border-subtle); }
+      .article-body { padding: 24px 20px; }
+      .doc-header { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="onboarding_dashboard.html" class="sidebar-logo">
+      <div class="logo-box">OB</div>
+      <div class="logo-text">
+        <h1>OnboardingApp</h1>
+        <small>v0.2 — Plataforma Activa</small>
+      </div>
+    </a>
+
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <a href="onboarding_dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="onboarding_cursos.html" class="nav-item active">
+        <span class="nav-icon">📚</span> Mis Cursos <span class="badge">3</span>
+      </a>
+      <a href="onboarding_progreso.html" class="nav-item">
+        <span class="nav-icon">📈</span> Mi Progreso
+      </a>
+      <a href="onboarding_materiales.html" class="nav-item">
+        <span class="nav-icon">📁</span> Materiales
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Actividad</div>
+      <a href="onboarding_notificaciones.html" class="nav-item">
+        <span class="nav-icon">🔔</span> Notificaciones <span class="badge notif-badge-count">2</span>
+      </a>
+      <a href="onboarding_constancias.html" class="nav-item">
+        <span class="nav-icon">🎓</span> Constancias
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Cuenta</div>
+      <a href="onboarding_configuracion.html" class="nav-item">
+        <span class="nav-icon">⚙️</span> Configuración
+      </a>
+    </div>
+
+    <div class="sidebar-user" onclick="window.location.href='onboarding_configuracion.html'">
+      <div class="avatar user-avatar-display">AR</div>
+      <div class="user-info">
+        <strong class="user-name-display">Alejandro Ruiz</strong>
+        <small class="user-role-display">Diseñador Junior</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" aria-label="Menú">☰</button>
+        <div class="breadcrumb">
+          <a href="onboarding_cursos.html">Mis Cursos</a>
+          <span class="sep">›</span>
+          <a href="onboarding_detalle_curso.html">Herramientas y Metodologías</a>
+          <span class="sep">›</span>
+          <span>Módulo 2: Lectura</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a href="onboarding_busqueda.html" class="search-trigger-btn">
+          <span>🔍 Buscar...</span>
+          <kbd>/</kbd>
+        </a>
+
+        <a href="onboarding_notificaciones.html" class="notif-btn" title="Notificaciones">
+          🔔<div class="notif-dot"></div>
+        </a>
+
+        <div class="profile-dropdown-container">
+          <div class="profile-trigger">
+            <div class="pt-avatar user-avatar-display">AR</div>
+            <span class="pt-name user-name-display">Alejandro Ruiz</span>
+            <span class="pt-caret">▼</span>
+          </div>
+
+          <div class="dropdown-menu">
+            <div class="dd-header">
+              <div class="dd-header-avatar user-avatar-display">AR</div>
+              <div class="dd-header-info">
+                <strong class="user-name-display">Alejandro Ruiz</strong>
+                <small class="user-email-display">alejandro.ruiz@empresa.com</small>
+              </div>
+            </div>
+            <a href="onboarding_configuracion.html" class="dd-item">👤 Mi Perfil</a>
+            <a href="onboarding_constancias.html" class="dd-item">🎓 Mis Constancias</a>
+            <a href="onboarding_progreso.html" class="dd-item">📊 Mi Progreso</a>
+            <a href="onboarding_configuracion.html" class="dd-item">⚙️ Configuración</a>
+            <hr class="dd-divider">
+            <a href="#" class="dd-item dd-logout">🚪 Cerrar Sesión</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- BODY WRAP -->
+    <div class="body-wrap">
+
+      <!-- Reading Content Column -->
+      <div class="reading-col" id="readingContainer" onscroll="updateScrollProgress()">
+
+        <!-- Reading Progress Fill -->
+        <div class="reading-progress-bar">
+          <div class="reading-progress-fill" id="readProgress"></div>
+        </div>
+
+        <!-- Document Header -->
+        <div class="doc-header">
+          <span class="doc-type-badge">📖 Guía Oficial y Estándares</span>
+          <h1>Convenciones de Código, Flujo Git y Comunicación</h1>
+          <div class="doc-meta">
+            <span>⏱️ 20 min de lectura</span>
+            <span>📅 Actualizado: Agosto 2026</span>
+            <span>✍️ Equipo de Ingeniería & Agile</span>
+          </div>
+        </div>
+
+        <!-- Reader Controls Bar -->
+        <div class="reader-controls">
+          <span>Barra de progreso superior activa</span>
+          <div class="font-btns">
+            <span style="font-size: 12px; margin-right: 6px;">Tamaño:</span>
+            <button class="font-btn" onclick="changeFontSize(-1)">A-</button>
+            <button class="font-btn" onclick="changeFontSize(1)">A+</button>
+          </div>
+        </div>
+
+        <!-- Article Body -->
+        <article class="article-body" id="articleBody">
+          
+          <p>Bienvenido al módulo de estándares de trabajo. En esta guía documentamos las directrices que permiten a nuestros equipos multidisciplinarios entregar valor de manera predecible, segura y con alta calidad de software.</p>
+
+          <div class="callout">
+            <strong>💡 Principio Clave:</strong> La consistencia en nuestros estándares reduce la fricción técnica y permite que cualquier miembro del equipo pueda entender y colaborar en cualquier módulo del proyecto.
+          </div>
+
+          <h2>1. Convención de Ramas en Git</h2>
+          <p>La rama <code>main</code> contiene el código que se encuentra actualmente en producción o listo para despliegue inmediato. Ningún desarrollador puede realizar <code>push</code> directo a <code>main</code>.</p>
+          
+          <h3>Formato estándar de ramas:</h3>
+          <div class="code-block">
+feature/[TICKET-ID]-descripcion-corta    # Nuevas funcionalidades
+fix/[TICKET-ID]-descripcion-del-bug     # Corrección de errores
+docs/[TICKET-ID]-tema-documentado       # Mejoras en documentación
+refactor/[TICKET-ID]-modulo-optimizado  # Refactorizaciones sin cambio de comportamiento
+          </div>
+
+          <p>Ejemplo práctico: <code>feature/DES-142-onboarding-form</code></p>
+
+          <h2>2. Formato de Commits Semánticos</h2>
+          <p>Seguimos la especificación de <strong>Conventional Commits</strong> para facilitar la generación automática de changelogs y versionado semántico.</p>
+
+          <div class="code-block">
+feat(auth): agregar autenticación por SSO con Azure AD
+fix(perfil): resolver error de carga en avatar de usuario
+docs(readme): actualizar instrucciones de instalación local
+          </div>
+
+          <h2>3. Buenas Prácticas en Pull Requests</h2>
+          <p>Antes de solicitar la revisión de tu código, asegúrate de cumplir con la siguiente lista de verificación:</p>
+
+          <div class="callout callout-success">
+            <strong>Checklist obligatorio de PR:</strong>
+            <ul style="margin-top: 8px; padding-left: 20px;">
+              <li>El tamaño del PR no supera las <strong>400 líneas modificadas</strong> (salvo dependencias generadas).</li>
+              <li>Pasan todas las pruebas unitarias y linters automáticos en el CI.</li>
+              <li>Se incluye descripción del cambio y captura de pantalla si incluye cambios visuales.</li>
+              <li>Cuenta con al menos <strong>una aprobación (LGTM)</strong> de un revisor asignado.</li>
+            </ul>
+          </div>
+
+          <h2>4. Gestión de Tareas en Jira</h2>
+          <p>Cada tarea debe reflejar su estado en tiempo real. Cuando comiences a trabajar, muévela a <code>In Progress</code>. Al crear el Pull Request, muévela a <code>In Review</code>.</p>
+
+          <!-- Complete Module Action -->
+          <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+            <a href="onboarding_modulo_video.html" class="btn btn-secondary">← Módulo Anterior (Video)</a>
+            <button class="btn btn-accent" onclick="completeAndGoEval()">Completar Lectura e Iniciar Evaluación →</button>
+          </div>
+
+        </article>
+
+      </div>
+
+      <!-- Playlist Sidebar -->
+      <aside class="playlist-sidebar">
+        <h4 style="font-size: 15px; font-weight: 800; color: var(--text-white); margin-bottom: 16px;">Módulos del Curso</h4>
+
+        <a href="onboarding_modulo_video.html" class="playlist-item">
+          <div class="pi-num pi-done">✓</div>
+          <div class="pi-info">
+            <h5>1. Introducción al Ecosistema</h5>
+            <small>🎬 Video interactivo · 14 min</small>
+          </div>
+        </a>
+
+        <a href="onboarding_modulo_lectura.html" class="playlist-item active">
+          <div class="pi-num pi-curr">2</div>
+          <div class="pi-info">
+            <h5>2. Convenciones y Políticas</h5>
+            <small>📖 Lectura guiada (En curso)</small>
+          </div>
+        </a>
+
+        <a href="onboarding_evaluacion.html" class="playlist-item">
+          <div class="pi-num pi-pend">3</div>
+          <div class="pi-info">
+            <h5>3. Evaluación de Conocimientos</h5>
+            <small>📝 Examen final · 10 preguntas</small>
+          </div>
+        </a>
+
+        <a href="onboarding_materiales.html" class="playlist-item">
+          <div class="pi-num pi-pend">4</div>
+          <div class="pi-info">
+            <h5>4. Recursos y Descargables</h5>
+            <small>📁 Guías y plantillas oficiales</small>
+          </div>
+        </a>
+
+        <div style="margin-top: auto; padding-top: 20px;">
+          <a href="onboarding_detalle_curso.html" class="btn btn-ghost" style="width: 100%;">← Volver al temario</a>
+        </div>
+      </aside>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  let currentFontSize = 15.5;
+
+  function updateScrollProgress() {
+    const el = document.getElementById('readingContainer');
+    const totalHeight = el.scrollHeight - el.clientHeight;
+    if (totalHeight > 0) {
+      const scrolled = (el.scrollTop / totalHeight) * 100;
+      document.getElementById('readProgress').style.width = scrolled + '%';
+    }
+  }
+
+  function changeFontSize(delta) {
+    currentFontSize = Math.max(13, Math.min(22, currentFontSize + delta));
+    document.getElementById('articleBody').style.fontSize = currentFontSize + 'px';
+  }
+
+  function completeAndGoEval() {
+    OnboardingApp.completeModule('c3', 'm2');
+    OnboardingApp.showToast('Lectura completada', 'Pasando a la evaluación de conocimientos...', 'success');
+    setTimeout(() => {
+      window.location.href = 'onboarding_evaluacion.html';
+    }, 800);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Specific Dashboard Styles */
+    .welcome-bar {
+      background: linear-gradient(105deg, #2a124e 0%, var(--morado) 40%, var(--azul-med) 80%, var(--azul) 100%);
+      border-radius: var(--radius-xl);
+      padding: 30px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .welcome-bar::after {
+      content: '';
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      border: 40px solid rgba(255, 255, 255, 0.05);
+      right: -60px;
+      top: -80px;
+      pointer-events: none;
+    }
+
+    .welcome-text h3 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .welcome-text p {
+      font-size: 14.5px;
+      color: rgba(255, 255, 255, 0.75);
+      max-width: 540px;
+    }
+
+    .welcome-action {
+      margin-top: 16px;
+    }
+
+    .progress-summary {
+      text-align: right;
+      z-index: 1;
+      flex-shrink: 0;
+    }
+
+    .progress-summary .pct {
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--naranja-cl);
+      line-height: 1;
+      text-shadow: 0 0 20px rgba(224, 110, 40, 0.4);
+    }
+
+    .progress-summary small {
+      display: block;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.65);
+      margin-top: 5px;
+      font-weight: 500;
+    }
+
+    .progress-bar-wrap {
+      margin-top: 12px;
+      width: 180px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-left: auto;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--naranja), var(--naranja-cl));
+      border-radius: var(--radius-full);
+      width: 50%;
+      transition: width 0.6s ease;
+    }
+
+    /* Main Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-title a {
+      font-size: 13px;
+      color: var(--naranja-cl);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .section-title a:hover {
+      text-decoration: underline;
+    }
+
+    /* Course Cards */
+    .course-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .course-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: var(--transition);
+    }
+
+    .course-card:hover {
+      border-color: rgba(90, 45, 158, 0.55);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .course-ico {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .ico-purple { background: rgba(61, 31, 110, 0.45); }
+    .ico-orange { background: rgba(196, 92, 26, 0.25); }
+    .ico-blue   { background: rgba(30, 58, 110, 0.5); }
+    .ico-teal   { background: rgba(8, 48, 40, 0.6); }
+
+    .course-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .course-info h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .course-info p {
+      font-size: 13px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .course-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .cprogress {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .pct-done { color: var(--verde); }
+    .pct-prog { color: var(--naranja-cl); }
+    .pct-pend { color: var(--morado-glow); }
+
+    .mini-bar {
+      width: 100px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-left: auto;
+    }
+
+    .mini-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+    }
+
+    .fill-done { background: var(--verde); }
+    .fill-prog { background: var(--naranja-cl); }
+    .fill-pend { background: var(--morado-cl); width: 0%; }
+
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      margin-top: 6px;
+    }
+
+    .tag-done { background: rgba(76, 175, 130, 0.2); color: var(--verde); border: 1px solid rgba(76, 175, 130, 0.3); }
+    .tag-prog { background: rgba(196, 92, 26, 0.2); color: var(--naranja-cl); border: 1px solid rgba(196, 92, 26, 0.3); }
+    .tag-pend { background: rgba(90, 45, 158, 0.25); color: #c09aff; border: 1px solid rgba(90, 45, 158, 0.35); }
+
+    /* Right Column Widgets */
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .notif-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      text-decoration: none;
+      color: inherit;
+      transition: var(--transition);
+    }
+
+    .notif-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .notif-item:hover {
+      transform: translateX(3px);
+    }
+
+    .notif-ico {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .ni-orange { background: rgba(196, 92, 26, 0.2); }
+    .ni-purple { background: rgba(61, 31, 110, 0.35); }
+    .ni-blue   { background: rgba(30, 58, 110, 0.4); }
+
+    .notif-text p {
+      font-size: 13.5px;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    .notif-text small {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .cert-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .cert-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .cert-icon {
+      font-size: 22px;
+    }
+
+    .cert-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .cert-info strong {
+      display: block;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cert-info small {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .btn-dl {
+      font-size: 12px;
+      padding: 6px 12px;
+      background: rgba(196, 92, 26, 0.2);
+      color: var(--naranja-cl);
+      border: 1px solid rgba(196, 92, 26, 0.35);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .btn-dl:hover {
+      background: var(--naranja);
+      color: #fff;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="onboarding_dashboard.html" class="sidebar-logo">
+      <div class="logo-box">OB</div>
+      <div class="logo-text">
+        <h1>OnboardingApp</h1>
+        <small>v0.2 — Plataforma Activa</small>
+      </div>
+    </a>
+
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <a href="onboarding_dashboard.html" class="nav-item active">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="onboarding_cursos.html" class="nav-item">
+        <span class="nav-icon">📚</span> Mis Cursos <span class="badge">3</span>
+      </a>
+      <a href="onboarding_progreso.html" class="nav-item">
+        <span class="nav-icon">📈</span> Mi Progreso
+      </a>
+      <a href="onboarding_materiales.html" class="nav-item">
+        <span class="nav-icon">📁</span> Materiales
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Actividad</div>
+      <a href="onboarding_notificaciones.html" class="nav-item">
+        <span class="nav-icon">🔔</span> Notificaciones <span class="badge notif-badge-count">2</span>
+      </a>
+      <a href="onboarding_constancias.html" class="nav-item">
+        <span class="nav-icon">🎓</span> Constancias
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Cuenta</div>
+      <a href="onboarding_configuracion.html" class="nav-item">
+        <span class="nav-icon">⚙️</span> Configuración
+      </a>
+    </div>
+
+    <div class="sidebar-user" onclick="window.location.href='onboarding_configuracion.html'">
+      <div class="avatar user-avatar-display">AR</div>
+      <div class="user-info">
+        <strong class="user-name-display">Alejandro Ruiz</strong>
+        <small class="user-role-display">Diseñador Junior</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" aria-label="Menú">☰</button>
+        <div>
+          <h2>Dashboard</h2>
+          <p>Bienvenido a tu centro de capacitación e inducción</p>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a href="onboarding_busqueda.html" class="search-trigger-btn">
+          <span>🔍 Buscar cursos o materiales...</span>
+          <kbd>/</kbd>
+        </a>
+
+        <a href="onboarding_notificaciones.html" class="notif-btn" title="Notificaciones">
+          🔔<div class="notif-dot"></div>
+        </a>
+
+        <!-- Profile Dropdown Trigger -->
+        <div class="profile-dropdown-container">
+          <div class="profile-trigger">
+            <div class="pt-avatar user-avatar-display">AR</div>
+            <span class="pt-name user-name-display">Alejandro Ruiz</span>
+            <span class="pt-caret">▼</span>
+          </div>
+
+          <div class="dropdown-menu">
+            <div class="dd-header">
+              <div class="dd-header-avatar user-avatar-display">AR</div>
+              <div class="dd-header-info">
+                <strong class="user-name-display">Alejandro Ruiz</strong>
+                <small class="user-email-display">alejandro.ruiz@empresa.com</small>
+              </div>
+            </div>
+            <a href="onboarding_configuracion.html" class="dd-item">👤 Mi Perfil</a>
+            <a href="onboarding_constancias.html" class="dd-item">🎓 Mis Constancias</a>
+            <a href="onboarding_progreso.html" class="dd-item">📊 Mi Progreso</a>
+            <a href="onboarding_configuracion.html" class="dd-item">⚙️ Configuración</a>
+            <hr class="dd-divider">
+            <a href="#" class="dd-item dd-logout">🚪 Cerrar Sesión</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- Welcome Banner -->
+      <div class="welcome-bar">
+        <div class="welcome-text">
+          <h3>¡Hola de nuevo, <span class="user-name-display">Alejandro</span>! 👋</h3>
+          <p>Llevas un excelente ritmo de aprendizaje. Continúa con tu evaluación de <strong>Herramientas y metodologías de trabajo</strong> para desbloquear tu próxima constancia.</p>
+          <div class="welcome-action">
+            <a href="onboarding_detalle_curso.html" class="btn btn-accent">Continuar Curso Activo →</a>
+          </div>
+        </div>
+
+        <div class="progress-summary">
+          <div class="pct" id="dashOverallPct">50%</div>
+          <small>Progreso Global</small>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="dashOverallFill" style="width: 50%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Cursos en Curso</div>
+          <div class="stat-value" style="color: var(--naranja-cl)">1</div>
+          <div class="stat-sub">1 pendiente de evaluación</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Cursos Completados</div>
+          <div class="stat-value" style="color: var(--verde)">2</div>
+          <div class="stat-sub">De 5 cursos asignados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Horas Acumuladas</div>
+          <div class="stat-value">5.2h</div>
+          <div class="stat-sub">+1.5h registradas esta semana</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Constancias Obtenidas</div>
+          <div class="stat-value" style="color: var(--dorado-cl)">2</div>
+          <div class="stat-sub">Verificables oficialmente</div>
+        </div>
+      </div>
+
+      <!-- Main Layout -->
+      <div class="dashboard-grid">
+
+        <!-- Left: Course List -->
+        <div>
+          <div class="section-title">
+            <span>Ruta de Capacitación Asignada</span>
+            <a href="onboarding_cursos.html">Ver todos los cursos →</a>
+          </div>
+
+          <div class="course-list">
+
+            <!-- Course 1 -->
+            <a href="onboarding_detalle_curso.html" class="course-card">
+              <div class="course-ico ico-purple">🏛️</div>
+              <div class="course-info">
+                <h4>Cultura y Valores de la Empresa</h4>
+                <p>Inducción general · Mariana Silva (Talent Director)</p>
+              </div>
+              <div class="course-right">
+                <div class="cprogress pct-done">100%</div>
+                <div class="mini-bar"><div class="mini-fill fill-done" style="width:100%"></div></div>
+                <span class="tag tag-done">✓ Completado</span>
+              </div>
+            </a>
+
+            <!-- Course 2 -->
+            <a href="onboarding_detalle_curso.html" class="course-card">
+              <div class="course-ico ico-orange">🔒</div>
+              <div class="course-info">
+                <h4>Seguridad de la Información y Políticas</h4>
+                <p>Ciberseguridad y protección de datos · Carlos Mendoza</p>
+              </div>
+              <div class="course-right">
+                <div class="cprogress pct-done">100%</div>
+                <div class="mini-bar"><div class="mini-fill fill-done" style="width:100%"></div></div>
+                <span class="tag tag-done">✓ Completado</span>
+              </div>
+            </a>
+
+            <!-- Course 3 (Active) -->
+            <a href="onboarding_detalle_curso.html" class="course-card" style="border-color: rgba(196, 92, 26, 0.45); background: rgba(34, 34, 51, 0.9);">
+              <div class="course-ico ico-blue">🛠️</div>
+              <div class="course-info">
+                <h4>Herramientas y Metodologías de Trabajo</h4>
+                <p>Git, Jira, Scrum y Slack · Sofía Valenzuela (Lead PM)</p>
+              </div>
+              <div class="course-right">
+                <div class="cprogress pct-prog">50%</div>
+                <div class="mini-bar"><div class="mini-fill fill-prog" style="width:50%"></div></div>
+                <span class="tag tag-prog">⚡ En Progreso</span>
+              </div>
+            </a>
+
+            <!-- Course 4 -->
+            <a href="onboarding_detalle_curso.html" class="course-card">
+              <div class="course-ico ico-teal">⚡</div>
+              <div class="course-info">
+                <h4>Arquitectura de Software y Estándares</h4>
+                <p>Clean code y lineamientos técnicos · Rodrigo Galindo</p>
+              </div>
+              <div class="course-right">
+                <div class="cprogress pct-pend">0%</div>
+                <div class="mini-bar"><div class="mini-fill fill-pend"></div></div>
+                <span class="tag tag-pend">⏳ Pendiente</span>
+              </div>
+            </a>
+
+          </div>
+        </div>
+
+        <!-- Right: Activity & Certificates -->
+        <div class="right-col">
+
+          <!-- Notifications Widget -->
+          <div class="panel">
+            <div class="section-title">
+              <span>Notificaciones Recientes</span>
+              <a href="onboarding_notificaciones.html">Ver todas</a>
+            </div>
+
+            <div class="notif-item" onclick="window.location.href='onboarding_evaluacion.html'">
+              <div class="notif-ico ni-orange">📝</div>
+              <div class="notif-text">
+                <p><strong>Evaluación pendiente:</strong> Herramientas y metodologías.</p>
+                <small>Hace 30 minutos</small>
+              </div>
+            </div>
+
+            <div class="notif-item" onclick="window.location.href='onboarding_constancias.html'">
+              <div class="notif-ico ni-purple">🎓</div>
+              <div class="notif-text">
+                <p><strong>Constancia emitida:</strong> Seguridad de la Información lista.</p>
+                <small>Hace 2 horas</small>
+              </div>
+            </div>
+
+            <div class="notif-item" onclick="window.location.href='onboarding_materiales.html'">
+              <div class="notif-ico ni-blue">📄</div>
+              <div class="notif-text">
+                <p><strong>Nuevo material:</strong> Guía de Convenciones Git v2.4.</p>
+                <small>Ayer</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Certificates Widget -->
+          <div class="panel">
+            <div class="section-title">
+              <span>Mis Constancias</span>
+              <a href="onboarding_constancias.html">Ver todas</a>
+            </div>
+
+            <div class="cert-item">
+              <div class="cert-icon">📜</div>
+              <div class="cert-info">
+                <strong>Cultura y Valores</strong>
+                <small>Emitida · 12 Ago 2026</small>
+              </div>
+              <a href="onboarding_constancia_pdf.html?cert=cultura" class="btn-dl">Ver PDF</a>
+            </div>
+
+            <div class="cert-item">
+              <div class="cert-icon">🔒</div>
+              <div class="cert-info">
+                <strong>Seguridad Informática</strong>
+                <small>Emitida · 14 Ago 2026</small>
+              </div>
+              <a href="onboarding_constancia_pdf.html?cert=seguridad" class="btn-dl">Ver PDF</a>
+            </div>
+
+            <div style="margin-top: 14px; text-align: center;">
+              <a href="onboarding_constancias.html" class="btn btn-secondary" style="width:100%; font-size:12.5px;">Acceder al Portal de Constancias</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const overall = OnboardingApp.getOverallProgress();
+    const pctEl = document.getElementById('dashOverallPct');
+    const fillEl = document.getElementById('dashOverallFill');
+    if (pctEl) pctEl.textContent = overall + '%';
+    if (fillEl) fillEl.style.width = overall + '%';
+  });
+</script>
+</body>
+</html>

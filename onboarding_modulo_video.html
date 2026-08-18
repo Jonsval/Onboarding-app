@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Módulo Video</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .body-wrap {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .video-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 24px 32px;
+      min-width: 0;
+    }
+
+    /* Video Player */
+    .player-wrap {
+      background: #000000;
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      max-height: 520px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .player-canvas-sim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #090c17 0%, #15223e 50%, #2a1147 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .player-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .play-btn {
+      position: relative;
+      z-index: 2;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--naranja);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 0 0 10px rgba(196,92,26,0.25), 0 0 0 20px rgba(196,92,26,0.1);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: none;
+    }
+
+    .play-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .player-title {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      padding: 36px 24px 16px;
+      background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .player-badge {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 2;
+      background: rgba(30,58,110,0.85);
+      color: #7eaaff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      backdrop-filter: blur(6px);
+    }
+
+    /* Player Controls Bar */
+    .player-controls {
+      background: #0e0e1a;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      border-top: none;
+      margin-bottom: 24px;
+    }
+
+    .ctrl-btn {
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      transition: color 0.15s;
+    }
+
+    .ctrl-btn:hover {
+      color: var(--text-white);
+    }
+
+    .ctrl-btn.play {
+      color: var(--naranja-cl);
+      font-size: 22px;
+    }
+
+    .progress-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .progress-track {
+      height: 6px;
+      background: rgba(255,255,255,0.12);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 45%;
+      background: linear-gradient(90deg, var(--naranja), var(--naranja-cl));
+      border-radius: var(--radius-full);
+      transition: width 0.1s linear;
+    }
+
+    .time-display {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+
+    .speed-select {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 12px;
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    /* Tabs Section */
+    .tabs-nav {
+      display: flex;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .tab-btn.active {
+      color: var(--text-white);
+      border-bottom-color: var(--naranja-cl);
+    }
+
+    .tab-content {
+      display: none;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Module Playlist Sidebar */
+    .playlist-sidebar {
+      width: 360px;
+      background: var(--bg-sidebar);
+      border-left: 1px solid var(--border-subtle);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .playlist-item {
+      display: flex;
+      gap: 12px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 10px;
+      text-decoration: none;
+      color: inherit;
+      transition: var(--transition);
+    }
+
+    .playlist-item:hover {
+      border-color: var(--border-med);
+      transform: translateX(2px);
+    }
+
+    .playlist-item.active {
+      border-color: var(--morado-cl);
+      background: rgba(61, 31, 110, 0.25);
+    }
+
+    .pi-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .pi-done { background: rgba(76, 175, 130, 0.2); color: var(--verde); }
+    .pi-curr { background: var(--naranja); color: #fff; }
+    .pi-pend { background: rgba(255, 255, 255, 0.05); color: var(--text-dim); }
+
+    .pi-info h5 {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .pi-info small {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 960px) {
+      .body-wrap { flex-direction: column; }
+      .playlist-sidebar { width: 100%; border-left: none; border-top: 1px solid var(--border-subtle); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="onboarding_dashboard.html" class="sidebar-logo">
+      <div class="logo-box">OB</div>
+      <div class="logo-text">
+        <h1>OnboardingApp</h1>
+        <small>v0.2 — Plataforma Activa</small>
+      </div>
+    </a>
+
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <a href="onboarding_dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="onboarding_cursos.html" class="nav-item active">
+        <span class="nav-icon">📚</span> Mis Cursos <span class="badge">3</span>
+      </a>
+      <a href="onboarding_progreso.html" class="nav-item">
+        <span class="nav-icon">📈</span> Mi Progreso
+      </a>
+      <a href="onboarding_materiales.html" class="nav-item">
+        <span class="nav-icon">📁</span> Materiales
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Actividad</div>
+      <a href="onboarding_notificaciones.html" class="nav-item">
+        <span class="nav-icon">🔔</span> Notificaciones <span class="badge notif-badge-count">2</span>
+      </a>
+      <a href="onboarding_constancias.html" class="nav-item">
+        <span class="nav-icon">🎓</span> Constancias
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Cuenta</div>
+      <a href="onboarding_configuracion.html" class="nav-item">
+        <span class="nav-icon">⚙️</span> Configuración
+      </a>
+    </div>
+
+    <div class="sidebar-user" onclick="window.location.href='onboarding_configuracion.html'">
+      <div class="avatar user-avatar-display">AR</div>
+      <div class="user-info">
+        <strong class="user-name-display">Alejandro Ruiz</strong>
+        <small class="user-role-display">Diseñador Junior</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" aria-label="Menú">☰</button>
+        <div class="breadcrumb">
+          <a href="onboarding_cursos.html">Mis Cursos</a>
+          <span class="sep">›</span>
+          <a href="onboarding_detalle_curso.html">Herramientas y Metodologías</a>
+          <span class="sep">›</span>
+          <span>Módulo 1: Video</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a href="onboarding_busqueda.html" class="search-trigger-btn">
+          <span>🔍 Buscar...</span>
+          <kbd>/</kbd>
+        </a>
+
+        <a href="onboarding_notificaciones.html" class="notif-btn" title="Notificaciones">
+          🔔<div class="notif-dot"></div>
+        </a>
+
+        <div class="profile-dropdown-container">
+          <div class="profile-trigger">
+            <div class="pt-avatar user-avatar-display">AR</div>
+            <span class="pt-name user-name-display">Alejandro Ruiz</span>
+            <span class="pt-caret">▼</span>
+          </div>
+
+          <div class="dropdown-menu">
+            <div class="dd-header">
+              <div class="dd-header-avatar user-avatar-display">AR</div>
+              <div class="dd-header-info">
+                <strong class="user-name-display">Alejandro Ruiz</strong>
+                <small class="user-email-display">alejandro.ruiz@empresa.com</small>
+              </div>
+            </div>
+            <a href="onboarding_configuracion.html" class="dd-item">👤 Mi Perfil</a>
+            <a href="onboarding_constancias.html" class="dd-item">🎓 Mis Constancias</a>
+            <a href="onboarding_progreso.html" class="dd-item">📊 Mi Progreso</a>
+            <a href="onboarding_configuracion.html" class="dd-item">⚙️ Configuración</a>
+            <hr class="dd-divider">
+            <a href="#" class="dd-item dd-logout">🚪 Cerrar Sesión</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- BODY WRAP -->
+    <div class="body-wrap">
+
+      <!-- Left Video Column -->
+      <div class="video-col">
+
+        <!-- Interactive Simulated Video Player -->
+        <div class="player-wrap" id="playerWrap">
+          <div class="player-canvas-sim">
+            <div class="player-grid"></div>
+            <span class="player-badge">🎬 Video HD · 1080p</span>
+            <button class="play-btn" id="mainPlayBtn" onclick="togglePlay()">▶</button>
+            <div class="player-title">1.1 Bienvenida e Introducción al Ecosistema de Trabajo (14:10)</div>
+          </div>
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="player-controls">
+          <button class="ctrl-btn play" id="ctrlPlayBtn" onclick="togglePlay()">▶</button>
+          
+          <div class="progress-wrap">
+            <div class="progress-track" onclick="seekVideo(event)">
+              <div class="progress-fill" id="videoFill" style="width: 35%;"></div>
+            </div>
+            <div class="time-display">
+              <span id="currentTime">05:10</span>
+              <span>14:10</span>
+            </div>
+          </div>
+
+          <button class="ctrl-btn" onclick="toggleMute()" id="muteBtn" title="Silenciar">🔊</button>
+          
+          <select class="speed-select" onchange="changeSpeed(this.value)">
+            <option value="1">1.0x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2.0x</option>
+          </select>
+
+          <button class="ctrl-btn" onclick="toggleFullscreen()" title="Pantalla Completa">⛶</button>
+        </div>
+
+        <!-- Action Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h2 style="font-size: 20px; font-weight: 800; color: var(--text-white);">Módulo 1: Ecosistema y Flujo de Trabajo</h2>
+            <p style="font-size: 13.5px; color: var(--text-muted);">Instructor: Sofía Valenzuela · Actualizado Agosto 2026</p>
+          </div>
+          <button class="btn btn-accent" onclick="completeAndNext()">Marcar Completado y Siguiente →</button>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs-nav">
+          <button class="tab-btn active" onclick="switchTab('notes', this)">📝 Notas del Módulo</button>
+          <button class="tab-btn" onclick="switchTab('transcript', this)">📄 Transcripción</button>
+          <button class="tab-btn" onclick="switchTab('resources', this)">📎 Recursos Descargables</button>
+        </div>
+
+        <!-- Tab: Notes -->
+        <div class="tab-content active" id="tab-notes">
+          <div class="panel">
+            <h4 style="font-size: 15px; font-weight: 700; color: var(--text-white); margin-bottom: 12px;">Puntos Clave del Video:</h4>
+            <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+              <li><strong>Canales de Slack:</strong> <code>#general</code> para anuncios, <code>#dev-team</code> para consultas técnicas, <code>#incidentes-criticos-alerta</code> para bloqueos de producción.</li>
+              <li><strong>Convención de Commits:</strong> Usamos Conventional Commits (<code>feat:</code>, <code>fix:</code>, <code>docs:</code>, <code>refactor:</code>).</li>
+              <li><strong>Ramas en Git:</strong> <code>main</code> siempre está protegida. Cada funcionalidad nace de <code>main</code> con el formato <code>feature/TICKET-descripcion</code>.</li>
+              <li><strong>Revisiones de Código:</strong> Todo Pull Request debe tener al menos una aprobación y pasar el pipeline de CI/CD antes de fusionarse.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Tab: Transcript -->
+        <div class="tab-content" id="tab-transcript">
+          <div class="panel" style="font-size: 13.5px; color: var(--text-muted); max-height: 250px; overflow-y: auto;">
+            <p><strong>[00:00]</strong> Hola y bienvenido al equipo. En esta primera sesión revisaremos las herramientas y acuerdos de trabajo que hacen que nuestro equipo sea ágil y eficiente...</p>
+            <p style="margin-top: 10px;"><strong>[03:20]</strong> Comencemos hablando de Git. Nuestro estándar requiere que ninguna persona suba código directo a la rama main sin pasar por un Pull Request revisado...</p>
+            <p style="margin-top: 10px;"><strong>[08:15]</strong> En Jira, asegúrate de mantener tus tickets al día. Si comienzas a trabajar en un requerimiento, muévelo a 'In Progress'...</p>
+          </div>
+        </div>
+
+        <!-- Tab: Resources -->
+        <div class="tab-content" id="tab-resources">
+          <div class="panel">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-subtle);">
+              <div>
+                <strong style="color: var(--text-white);">Guía de GitFlow y Conventional Commits (PDF)</strong>
+                <small style="display:block; color: var(--text-muted);">2.4 MB · Actualizado</small>
+              </div>
+              <button class="btn btn-secondary" onclick="OnboardingApp.downloadMockFile('Guia_GitFlow_2026.pdf')">Descargar PDF</button>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0;">
+              <div>
+                <strong style="color: var(--text-white);">Checklist de Configuración de Slack y 2FA</strong>
+                <small style="display:block; color: var(--text-muted);">1.1 MB · Guía rápida</small>
+              </div>
+              <button class="btn btn-secondary" onclick="OnboardingApp.downloadMockFile('Checklist_Slack_2FA.pdf')">Descargar PDF</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Playlist Column -->
+      <aside class="playlist-sidebar">
+        <h4 style="font-size: 15px; font-weight: 800; color: var(--text-white); margin-bottom: 16px;">Módulos del Curso</h4>
+
+        <!-- Mod 1 (Active) -->
+        <a href="onboarding_modulo_video.html" class="playlist-item active">
+          <div class="pi-num pi-curr">▶</div>
+          <div class="pi-info">
+            <h5>1. Introducción al Ecosistema</h5>
+            <small>🎬 Video · 14:10 min (En reproducción)</small>
+          </div>
+        </a>
+
+        <!-- Mod 2 -->
+        <a href="onboarding_modulo_lectura.html" class="playlist-item">
+          <div class="pi-num pi-done">✓</div>
+          <div class="pi-info">
+            <h5>2. Convenciones y Políticas</h5>
+            <small>📖 Lectura guiada · 20 min</small>
+          </div>
+        </a>
+
+        <!-- Mod 3 -->
+        <a href="onboarding_evaluacion.html" class="playlist-item">
+          <div class="pi-num pi-pend">3</div>
+          <div class="pi-info">
+            <h5>3. Evaluación de Conocimientos</h5>
+            <small>📝 Examen final · 10 preguntas</small>
+          </div>
+        </a>
+
+        <!-- Mod 4 -->
+        <a href="onboarding_materiales.html" class="playlist-item">
+          <div class="pi-num pi-pend">4</div>
+          <div class="pi-info">
+            <h5>4. Recursos y Descargables</h5>
+            <small>📁 Guías y plantillas oficiales</small>
+          </div>
+        </a>
+
+        <div style="margin-top: auto; padding-top: 20px;">
+          <a href="onboarding_detalle_curso.html" class="btn btn-ghost" style="width: 100%;">← Volver al temario general</a>
+        </div>
+      </aside>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  let isPlaying = false;
+  let progressPct = 35;
+  let interval = null;
+
+  function togglePlay() {
+    isPlaying = !isPlaying;
+    const playBtn = document.getElementById('mainPlayBtn');
+    const ctrlBtn = document.getElementById('ctrlPlayBtn');
+
+    if (isPlaying) {
+      playBtn.textContent = '⏸';
+      ctrlBtn.textContent = '⏸';
+      OnboardingApp.showToast('Reproduciendo', 'Video en reproducción...', 'info');
+      interval = setInterval(() => {
+        if (progressPct < 100) {
+          progressPct += 0.5;
+          document.getElementById('videoFill').style.width = progressPct + '%';
+          const currentSec = Math.round((progressPct / 100) * 850);
+          const mins = Math.floor(currentSec / 60).toString().padStart(2, '0');
+          const secs = (currentSec % 60).toString().padStart(2, '0');
+          document.getElementById('currentTime').textContent = `${mins}:${secs}`;
+        } else {
+          clearInterval(interval);
+          isPlaying = false;
+          playBtn.textContent = '▶';
+          ctrlBtn.textContent = '▶';
+        }
+      }, 500);
+    } else {
+      playBtn.textContent = '▶';
+      ctrlBtn.textContent = '▶';
+      clearInterval(interval);
+    }
+  }
+
+  function seekVideo(e) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    progressPct = Math.max(0, Math.min(100, (clickX / rect.width) * 100));
+    document.getElementById('videoFill').style.width = progressPct + '%';
+  }
+
+  function toggleMute() {
+    const btn = document.getElementById('muteBtn');
+    btn.textContent = btn.textContent === '🔊' ? '🔇' : '🔊';
+  }
+
+  function changeSpeed(val) {
+    OnboardingApp.showToast('Velocidad', `Velocidad ajustada a ${val}x`, 'info');
+  }
+
+  function toggleFullscreen() {
+    const player = document.getElementById('playerWrap');
+    if (!document.fullscreenElement) {
+      player.requestFullscreen().catch(err => console.log(err));
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + tabId).classList.add('active');
+  }
+
+  function completeAndNext() {
+    OnboardingApp.completeModule('c3', 'm1');
+    OnboardingApp.showToast('¡Módulo Completado!', 'Has completado el Módulo 1. Pasando a la lectura...', 'success');
+    setTimeout(() => {
+      window.location.href = 'onboarding_modulo_lectura.html';
+    }, 800);
+  }
+</script>
+</body>
+</html>

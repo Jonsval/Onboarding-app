@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Iniciar Sesión</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      background: var(--bg-body);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .login-container {
+      display: flex;
+      width: 100%;
+      max-width: 1040px;
+      min-height: 620px;
+      background: var(--bg-panel);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Left Brand Panel */
+    .brand-panel {
+      width: 44%;
+      background: linear-gradient(145deg, #2a124e 0%, var(--morado) 40%, var(--azul-med) 80%, var(--azul) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 56px 44px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-panel::before {
+      content: '';
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      border: 44px solid rgba(255, 255, 255, 0.04);
+      top: -80px;
+      right: -80px;
+      pointer-events: none;
+    }
+
+    .brand-panel::after {
+      content: '';
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(196, 92, 26, 0.2), transparent 70%);
+      bottom: -60px;
+      left: -60px;
+      pointer-events: none;
+    }
+
+    .brand-top {
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-top .logo-box {
+      width: 54px;
+      height: 54px;
+      font-size: 22px;
+      margin-bottom: 28px;
+    }
+
+    .brand-top h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.25;
+      margin-bottom: 14px;
+    }
+
+    .brand-top p {
+      font-size: 15px;
+      color: rgba(240, 239, 250, 0.72);
+      line-height: 1.6;
+    }
+
+    .brand-pills {
+      margin-top: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: rgba(240, 239, 250, 0.88);
+      font-weight: 500;
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--naranja-cl);
+      box-shadow: 0 0 8px var(--naranja-glow);
+      flex-shrink: 0;
+    }
+
+    .brand-footer {
+      font-size: 12px;
+      color: rgba(240, 239, 250, 0.45);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Right Form Panel */
+    .form-panel {
+      flex: 1;
+      padding: 56px 52px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--bg-panel);
+    }
+
+    .form-panel h2 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 6px;
+    }
+
+    .form-panel .subtitle {
+      font-size: 14.5px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .field {
+      margin-bottom: 20px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 15px;
+      outline: none;
+      transition: var(--transition);
+      font-family: var(--font-main);
+    }
+
+    .field input:focus {
+      border-color: var(--morado-cl);
+      background: rgba(90, 45, 158, 0.08);
+      box-shadow: 0 0 0 3px rgba(90, 45, 158, 0.2);
+    }
+
+    .form-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+      margin-bottom: 24px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .remember-me input {
+      accent-color: var(--morado-cl);
+      cursor: pointer;
+    }
+
+    .forgot a {
+      font-size: 13px;
+      color: var(--naranja-cl);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .forgot a:hover {
+      text-decoration: underline;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(90deg, var(--morado), var(--morado-cl));
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(90, 45, 158, 0.4);
+      transition: var(--transition);
+    }
+
+    .btn-login:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(90, 45, 158, 0.55);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 22px 0;
+    }
+
+    .divider hr {
+      flex: 1;
+      border: none;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .divider span {
+      font-size: 12px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-sso {
+      width: 100%;
+      padding: 13px;
+      background: transparent;
+      border: 1.5px solid var(--border-med);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: var(--transition);
+    }
+
+    .btn-sso:hover {
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-white);
+    }
+
+    .sso-icon {
+      width: 22px;
+      height: 22px;
+      background: var(--naranja);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .demo-hint {
+      margin-top: 20px;
+      padding: 10px 14px;
+      background: rgba(90, 45, 158, 0.15);
+      border: 1px solid rgba(90, 45, 158, 0.3);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      color: #c09aff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .demo-hint button {
+      background: var(--morado-cl);
+      color: #fff;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    @media (max-width: 860px) {
+      .login-container {
+        flex-direction: column;
+      }
+      .brand-panel {
+        width: 100%;
+        padding: 36px 28px;
+      }
+      .form-panel {
+        padding: 36px 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+
+  <!-- Left Panel -->
+  <div class="brand-panel">
+    <div class="brand-top">
+      <div class="logo-box">OB</div>
+      <h1>Plataforma de<br>Onboarding</h1>
+      <p>Tu ruta de capacitación centralizada y seguimiento integral desde el primer día.</p>
+      
+      <div class="brand-pills">
+        <div class="pill"><span class="pill-dot"></span> Cursos y módulos interactivos</div>
+        <div class="pill"><span class="pill-dot"></span> Seguimiento de avance en tiempo real</div>
+        <div class="pill"><span class="pill-dot"></span> Constancias oficiales descargables</div>
+        <div class="pill"><span class="pill-dot"></span> Evaluaciones y logros gamificados</div>
+      </div>
+    </div>
+
+    <div class="brand-footer">
+      © 2026 OnboardingApp — Todos los derechos reservados.
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="form-panel">
+    <h2>Bienvenido de regreso</h2>
+    <p class="subtitle">Ingresa tus credenciales corporativas para continuar</p>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="field">
+        <label for="emailInput">Correo corporativo</label>
+        <input type="email" id="emailInput" value="alejandro.ruiz@empresa.com" placeholder="nombre@empresa.com" required>
+      </div>
+
+      <div class="field">
+        <label for="passwordInput">Contraseña</label>
+        <input type="password" id="passwordInput" value="••••••••••••" placeholder="••••••••" required>
+      </div>
+
+      <div class="form-meta">
+        <label class="remember-me">
+          <input type="checkbox" checked> Recordar sesión
+        </label>
+        <div class="forgot">
+          <a href="#" onclick="handleForgotPassword(event)">¿Olvidaste tu contraseña?</a>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-login">Iniciar Sesión</button>
+    </form>
+
+    <div class="divider">
+      <hr><span>o accede con tu cuenta corporativa</span><hr>
+    </div>
+
+    <button type="button" class="btn-sso" onclick="handleSSOLogin()">
+      <div class="sso-icon">S</div>
+      Iniciar sesión con SSO Corporativo
+    </button>
+
+    <div class="demo-hint">
+      <span>💡 Modo Demostración activo</span>
+      <button type="button" onclick="handleDemoLogin()">Acceso Rápido Demo</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('emailInput').value.trim();
+    if (!email) {
+      OnboardingApp.showToast('Error', 'Por favor ingresa tu correo corporativo.', 'error');
+      return;
+    }
+
+    OnboardingApp.saveUser({ email: email });
+    OnboardingApp.showToast('¡Bienvenido!', 'Iniciando sesión en la plataforma...', 'success');
+    setTimeout(() => {
+      window.location.href = 'onboarding_dashboard.html';
+    }, 700);
+  }
+
+  function handleSSOLogin() {
+    OnboardingApp.showToast('Autenticación SSO', 'Validando credenciales en el proveedor de identidad...', 'info');
+    setTimeout(() => {
+      window.location.href = 'onboarding_dashboard.html';
+    }, 900);
+  }
+
+  function handleDemoLogin() {
+    document.getElementById('emailInput').value = 'alejandro.ruiz@empresa.com';
+    document.getElementById('passwordInput').value = 'demo12345';
+    OnboardingApp.showToast('Modo Demo', 'Cargando perfil de demostración...', 'success');
+    setTimeout(() => {
+      window.location.href = 'onboarding_dashboard.html';
+    }, 600);
+  }
+
+  function handleForgotPassword(e) {
+    e.preventDefault();
+    OnboardingApp.showToast('Recuperación enviada', 'Hemos enviado un enlace de restablecimiento a tu correo.', 'info');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnboardingApp — Evaluación</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .body-wrap {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .eval-col {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 48px;
+      min-width: 0;
+    }
+
+    /* Eval Header */
+    .eval-header {
+      background: linear-gradient(110deg, #1a1030 0%, #3d1f6e 60%, #1e3a6e 100%);
+      border-radius: var(--radius-lg);
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .eh-left h2 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 4px;
+    }
+
+    .eh-left p {
+      font-size: 13.5px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .eh-meta {
+      display: flex;
+      gap: 24px;
+    }
+
+    .eh-stat {
+      text-align: center;
+    }
+
+    .eh-stat-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .eh-stat-lbl {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    /* Pips Progress */
+    .q-progress-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 24px;
+    }
+
+    .q-pip {
+      flex: 1;
+      height: 6px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.08);
+      transition: background 0.2s;
+    }
+
+    .qp-done    { background: var(--verde); }
+    .qp-current { background: var(--naranja-cl); }
+    .qp-pending { background: rgba(255, 255, 255, 0.08); }
+
+    /* Question Card */
+    .question-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 32px 36px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .q-number {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--naranja-cl);
+      margin-bottom: 10px;
+    }
+
+    .q-text {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-white);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    /* Options */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .option-item:hover {
+      border-color: rgba(90, 45, 158, 0.5);
+      background: rgba(61, 31, 110, 0.12);
+    }
+
+    .option-item.selected {
+      border-color: var(--morado-cl);
+      background: rgba(61, 31, 110, 0.25);
+      box-shadow: 0 0 12px rgba(90, 45, 158, 0.2);
+    }
+
+    .option-radio {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--border-med);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+
+    .option-item.selected .option-radio {
+      border-color: var(--morado-cl);
+      background: var(--morado-cl);
+    }
+
+    .option-item.selected .option-radio::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .option-letter {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .option-item.selected .option-letter {
+      background: rgba(90, 45, 158, 0.4);
+      color: #c09aff;
+    }
+
+    .option-text {
+      font-size: 14.5px;
+      color: var(--text-primary);
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    /* Nav Buttons */
+    .eval-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 24px;
+    }
+
+    /* Summary Sidebar */
+    .summary-panel {
+      width: 330px;
+      flex-shrink: 0;
+      background: var(--bg-sidebar);
+      border-left: 1px solid var(--border-subtle);
+      padding: 28px 24px;
+      overflow-y: auto;
+    }
+
+    .sp-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 16px;
+    }
+
+    .q-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .q-chip {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      transition: var(--transition);
+      background: var(--bg-panel);
+    }
+
+    .q-chip:hover {
+      border-color: var(--border-med);
+      transform: scale(1.05);
+    }
+
+    .qc-done    { background: rgba(76, 175, 130, 0.2); color: var(--verde); border-color: rgba(76, 175, 130, 0.4); }
+    .qc-current { background: var(--naranja); color: #fff; border-color: transparent; box-shadow: 0 2px 8px rgba(196, 92, 26, 0.4); }
+    .qc-pending { background: rgba(255, 255, 255, 0.04); color: var(--text-dim); }
+
+    .sp-divider {
+      border: none;
+      border-top: 1px solid var(--border-subtle);
+      margin: 18px 0;
+    }
+
+    .sp-info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 13px;
+    }
+
+    .sp-info-row:last-of-type {
+      border-bottom: none;
+    }
+
+    .timer-box {
+      background: rgba(196, 92, 26, 0.12);
+      border: 1px solid rgba(196, 92, 26, 0.35);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .timer-val {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--naranja-cl);
+      font-family: var(--font-mono);
+      line-height: 1;
+    }
+
+    .timer-lbl {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 960px) {
+      .body-wrap { flex-direction: column; }
+      .summary-panel { width: 100%; border-left: none; border-top: 1px solid var(--border-subtle); }
+      .eval-col { padding: 24px 20px; }
+      .eval-header { flex-direction: column; gap: 16px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="onboarding_dashboard.html" class="sidebar-logo">
+      <div class="logo-box">OB</div>
+      <div class="logo-text">
+        <h1>OnboardingApp</h1>
+        <small>v0.2 — Plataforma Activa</small>
+      </div>
+    </a>
+
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <a href="onboarding_dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="onboarding_cursos.html" class="nav-item active">
+        <span class="nav-icon">📚</span> Mis Cursos <span class="badge">3</span>
+      </a>
+      <a href="onboarding_progreso.html" class="nav-item">
+        <span class="nav-icon">📈</span> Mi Progreso
+      </a>
+      <a href="onboarding_materiales.html" class="nav-item">
+        <span class="nav-icon">📁</span> Materiales
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Actividad</div>
+      <a href="onboarding_notificaciones.html" class="nav-item">
+        <span class="nav-icon">🔔</span> Notificaciones <span class="badge notif-badge-count">2</span>
+      </a>
+      <a href="onboarding_constancias.html" class="nav-item">
+        <span class="nav-icon">🎓</span> Constancias
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Cuenta</div>
+      <a href="onboarding_configuracion.html" class="nav-item">
+        <span class="nav-icon">⚙️</span> Configuración
+      </a>
+    </div>
+
+    <div class="sidebar-user" onclick="window.location.href='onboarding_configuracion.html'">
+      <div class="avatar user-avatar-display">AR</div>
+      <div class="user-info">
+        <strong class="user-name-display">Alejandro Ruiz</strong>
+        <small class="user-role-display">Diseñador Junior</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" aria-label="Menú">☰</button>
+        <div class="breadcrumb">
+          <a href="onboarding_cursos.html">Mis Cursos</a>
+          <span class="sep">›</span>
+          <a href="onboarding_detalle_curso.html">Herramientas y Metodologías</a>
+          <span class="sep">›</span>
+          <span>Evaluación Final</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a href="onboarding_notificaciones.html" class="notif-btn" title="Notificaciones">
+          🔔<div class="notif-dot"></div>
+        </a>
+
+        <div class="profile-dropdown-container">
+          <div class="profile-trigger">
+            <div class="pt-avatar user-avatar-display">AR</div>
+            <span class="pt-name user-name-display">Alejandro Ruiz</span>
+            <span class="pt-caret">▼</span>
+          </div>
+
+          <div class="dropdown-menu">
+            <div class="dd-header">
+              <div class="dd-header-avatar user-avatar-display">AR</div>
+              <div class="dd-header-info">
+                <strong class="user-name-display">Alejandro Ruiz</strong>
+                <small class="user-email-display">alejandro.ruiz@empresa.com</small>
+              </div>
+            </div>
+            <a href="onboarding_configuracion.html" class="dd-item">👤 Mi Perfil</a>
+            <a href="onboarding_constancias.html" class="dd-item">🎓 Mis Constancias</a>
+            <a href="onboarding_progreso.html" class="dd-item">📊 Mi Progreso</a>
+            <a href="onboarding_configuracion.html" class="dd-item">⚙️ Configuración</a>
+            <hr class="dd-divider">
+            <a href="#" class="dd-item dd-logout">🚪 Cerrar Sesión</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- EVALUATION CONTAINER -->
+    <div class="body-wrap">
+
+      <!-- Left Column -->
+      <div class="eval-col">
+
+        <!-- Header -->
+        <div class="eval-header">
+          <div class="eh-left">
+            <h2>Evaluación Final — Herramientas y Metodologías</h2>
+            <p>Responde las 10 preguntas. Necesitas al menos 80 puntos para aprobar y obtener tu constancia.</p>
+          </div>
+          <div class="eh-meta">
+            <div class="eh-stat">
+              <div class="eh-stat-val">10</div>
+              <div class="eh-stat-lbl">Preguntas</div>
+            </div>
+            <div class="eh-stat">
+              <div class="eh-stat-val">80 pts</div>
+              <div class="eh-stat-lbl">Aprobación</div>
+            </div>
+            <div class="eh-stat">
+              <div class="eh-stat-val" id="answeredRatio" style="color:var(--naranja-cl)">0 / 10</div>
+              <div class="eh-stat-lbl">Respondidas</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pips Progress -->
+        <div class="q-progress-bar" id="pipsContainer">
+          <!-- 10 pips rendered dynamically -->
+        </div>
+
+        <!-- Active Question Card -->
+        <div class="question-card" id="questionCard">
+          <div class="q-number" id="qNumberLabel">Pregunta 1 de 10</div>
+          <div class="q-text" id="qTextLabel">Cargando pregunta...</div>
+          <div class="options-grid" id="optionsContainer">
+            <!-- Options rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="eval-nav">
+          <button class="btn btn-secondary" id="btnPrev" onclick="navQuestion(-1)">← Pregunta anterior</button>
+          <button class="btn btn-primary" id="btnNext" onclick="navQuestion(1)">Siguiente pregunta →</button>
+        </div>
+
+      </div>
+
+      <!-- Right Summary Panel -->
+      <aside class="summary-panel">
+        
+        <div class="timer-box">
+          <div class="timer-val" id="evalTimer">25:00</div>
+          <div class="timer-lbl">Tiempo restante</div>
+        </div>
+
+        <div class="sp-title">Matriz de Preguntas</div>
+        <div class="q-grid" id="chipsContainer">
+          <!-- 10 Chips rendered dynamically -->
+        </div>
+
+        <hr class="sp-divider">
+        <div class="sp-info-row">
+          <span style="color: var(--text-muted);">Respondidas</span>
+          <span id="answeredCount" style="color: var(--verde); font-weight: 700;">0</span>
+        </div>
+        <div class="sp-info-row">
+          <span style="color: var(--text-muted);">Sin responder</span>
+          <span id="unansweredCount" style="color: #c09aff; font-weight: 700;">10</span>
+        </div>
+        <div class="sp-info-row">
+          <span style="color: var(--text-muted);">Intentos disponibles</span>
+          <span style="color: var(--text-primary); font-weight: 700;">3 de 3</span>
+        </div>
+        <div class="sp-info-row">
+          <span style="color: var(--text-muted);">Puntaje mínimo</span>
+          <span style="color: var(--text-primary); font-weight: 700;">80 / 100</span>
+        </div>
+
+        <button class="btn btn-success" style="width: 100%; margin-top: 24px; padding: 14px;" onclick="submitEvaluation()">
+          ✓ Enviar Evaluación
+        </button>
+
+      </aside>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  const questions = OnboardingApp.questions;
+  let currentIndex = 0;
+  let userAnswers = OnboardingApp.evalAnswers || {};
+  let timeLeft = 25 * 60; // 25 minutes
+  let timerInterval = null;
+
+  function initQuiz() {
+    startTimer();
+    renderQuestion();
+    renderSidebarMatrix();
+  }
+
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      if (timeLeft > 0) {
+        timeLeft--;
+        const mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+        const secs = (timeLeft % 60).toString().padStart(2, '0');
+        document.getElementById('evalTimer').textContent = `${mins}:${secs}`;
+      } else {
+        clearInterval(timerInterval);
+        OnboardingApp.showToast('Tiempo agotado', 'El tiempo de la evaluación ha finalizado.', 'warning');
+        submitEvaluation();
+      }
+    }, 1000);
+  }
+
+  function renderQuestion() {
+    const q = questions[currentIndex];
+    document.getElementById('qNumberLabel').textContent = `Pregunta ${currentIndex + 1} de ${questions.length} · ${q.category}`;
+    document.getElementById('qTextLabel').textContent = q.question;
+
+    const letters = ['A', 'B', 'C', 'D'];
+    const optionsHtml = q.options.map((opt, idx) => {
+      const isSelected = userAnswers[q.id] === idx;
+      return `
+        <div class="option-item ${isSelected ? 'selected' : ''}" onclick="selectOption(${q.id}, ${idx})">
+          <div class="option-radio"></div>
+          <div class="option-letter">${letters[idx]}</div>
+          <div class="option-text">${opt}</div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('optionsContainer').innerHTML = optionsHtml;
+
+    // Update nav buttons
+    document.getElementById('btnPrev').disabled = (currentIndex === 0);
+    document.getElementById('btnNext').textContent = (currentIndex === questions.length - 1) ? 'Revisar Evaluación' : 'Siguiente pregunta →';
+
+    // Render Pips
+    const pipsHtml = questions.map((_, i) => {
+      let cls = 'qp-pending';
+      if (i === currentIndex) cls = 'qp-current';
+      else if (userAnswers[questions[i].id] !== undefined) cls = 'qp-done';
+      return `<div class="q-pip ${cls}"></div>`;
+    }).join('');
+    document.getElementById('pipsContainer').innerHTML = pipsHtml;
+
+    renderSidebarMatrix();
+  }
+
+  function selectOption(qId, optionIdx) {
+    userAnswers[qId] = optionIdx;
+    OnboardingApp.evalAnswers = userAnswers;
+    localStorage.setItem('onboarding_evalAnswers', JSON.stringify(userAnswers));
+    renderQuestion();
+  }
+
+  function navQuestion(delta) {
+    const nextIdx = currentIndex + delta;
+    if (nextIdx >= 0 && nextIdx < questions.length) {
+      currentIndex = nextIdx;
+      renderQuestion();
+    } else if (nextIdx >= questions.length) {
+      // Reached the end
+      OnboardingApp.showToast('Revisión lista', 'Puedes revisar tus respuestas o hacer clic en "Enviar Evaluación".', 'info');
+    }
+  }
+
+  function jumpToQuestion(idx) {
+    currentIndex = idx;
+    renderQuestion();
+  }
+
+  function renderSidebarMatrix() {
+    const answered = Object.keys(userAnswers).length;
+    const unanswered = questions.length - answered;
+
+    document.getElementById('answeredRatio').textContent = `${answered} / ${questions.length}`;
+    document.getElementById('answeredCount').textContent = answered;
+    document.getElementById('unansweredCount').textContent = unanswered;
+
+    const chipsHtml = questions.map((q, idx) => {
+      let cls = 'qc-pending';
+      if (idx === currentIndex) cls = 'qc-current';
+      else if (userAnswers[q.id] !== undefined) cls = 'qc-done';
+
+      return `<div class="q-chip ${cls}" onclick="jumpToQuestion(${idx})">${idx + 1}</div>`;
+    }).join('');
+
+    document.getElementById('chipsContainer').innerHTML = chipsHtml;
+  }
+
+  function submitEvaluation() {
+    const answeredCount = Object.keys(userAnswers).length;
+    if (answeredCount < questions.length) {
+      if (!confirm(`Tienes ${questions.length - answeredCount} preguntas sin responder. ¿Deseas enviar la evaluación de todos modos?`)) {
+        return;
+      }
+    }
+
+    clearInterval(timerInterval);
+
+    // Calculate score
+    let correctCount = 0;
+    const resultsBreakdown = questions.map(q => {
+      const userSelected = userAnswers[q.id];
+      const isCorrect = (userSelected === q.correctIndex);
+      if (isCorrect) correctCount++;
+      return {
+        id: q.id,
+        category: q.category,
+        question: q.question,
+        userAnswerText: userSelected !== undefined ? q.options[userSelected] : 'Sin responder',
+        correctAnswerText: q.options[q.correctIndex],
+        isCorrect: isCorrect,
+        explanation: q.explanation
+      };
+    });
+
+    const score = Math.round((correctCount / questions.length) * 100);
+    const passed = score >= 80;
+    const timeUsedSec = (25 * 60) - timeLeft;
+    const mins = Math.floor(timeUsedSec / 60).toString().padStart(2, '0');
+    const secs = (timeUsedSec % 60).toString().padStart(2, '0');
+
+    const resultData = {
+      score: score,
+      passed: passed,
+      correctCount: correctCount,
+      wrongCount: questions.length - correctCount,
+      timeUsed: `${mins}:${secs}`,
+      breakdown: resultsBreakdown,
+      completedDate: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
+    };
+
+    OnboardingApp.saveEvalResult(resultData);
+
+    if (passed) {
+      OnboardingApp.completeModule('c3', 'm3');
+    }
+
+    OnboardingApp.showToast('Evaluación enviada', `Calificación calculada: ${score}/100 pts`, passed ? 'success' : 'warning');
+
+    setTimeout(() => {
+      window.location.href = 'onboarding_resultado_evaluacion.html';
+    }, 700);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initQuiz();
+  });
+</script>
+</body>
+</html>
